@@ -23,11 +23,13 @@ const App = () => {
 
   // logic for selecting a card
   const handleSelectCard = (card) => {
-    console.log(card);
+    let addToPlayedCards = [...playedCards, card];
+    setPlayedCards([...addToPlayedCards]);
   };
 
   // HeaderContainer for "Deal button" logic
   const handleDeal = (allCards) => {
+    setPlayedCards([]);
     dealHand(allCards);
   };
 
@@ -53,6 +55,17 @@ const App = () => {
       </div>
       <div>
         <p>Played cards</p>
+        {playedCards.map((card) => {
+          return (
+            <img
+              className="small-card"
+              src={`/cards/${card.code}.png`}
+              alt={card.name}
+              key={card.name}
+              // onClick={() => handleSelectCard(card)}
+            />
+          );
+        })}
       </div>
     </div>
   );
