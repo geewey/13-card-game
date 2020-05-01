@@ -25,6 +25,10 @@ const App = () => {
   const handleSelectCard = (card) => {
     let addToPlayedCards = [...playedCards, card];
     setPlayedCards([...addToPlayedCards]);
+
+    let newHand = [...hand];
+    newHand = hand.filter((remainingCards) => remainingCards !== card);
+    setHand(newHand);
   };
 
   // HeaderContainer for "Deal button" logic
@@ -35,11 +39,11 @@ const App = () => {
 
   return (
     <div>
-      <div>
+      <div className="header-container">
         {/* clears played cards, assigns 13 new random cards */}
         <button onClick={() => handleDeal(allCards)}>Deal button</button>
       </div>
-      <div>
+      <div className="hand-container">
         <p>Your hand (13 random cards)</p>
         {hand.map((card) => {
           return (
@@ -53,7 +57,7 @@ const App = () => {
           );
         })}
       </div>
-      <div>
+      <div className="played-cards-container">
         <p>Played cards</p>
         {playedCards.map((card) => {
           return (
