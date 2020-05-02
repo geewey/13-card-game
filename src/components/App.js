@@ -51,20 +51,22 @@ const App = () => {
 
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
-    console.log("Selected Cards: ", selectedCards);
+    // add selected cards to played cards
+    let allPlayedCards = [...selectedCards, ...playedCards];
+    setPlayedCards(allPlayedCards);
 
-    let addToPlayedCards = [...playedCards, ...selectedCards];
-    setPlayedCards(addToPlayedCards);
-
+    // iterate selected cards and filter each out of hand
+    // then, set new hand
     let updatedHand = [...hand];
     selectedCards.forEach((selectedCard) => {
-      updatedHand = hand.filter(
-        (remainingCards) => remainingCards !== selectedCard
+      updatedHand = updatedHand.filter(
+        (remainingCard) => remainingCard !== selectedCard
       );
     });
     setHand(updatedHand);
 
-    debugger;
+    // clear selected cards
+    setSelectedCards([]);
   };
 
   // HeaderContainer for "Deal button" logic
@@ -88,7 +90,6 @@ const App = () => {
           return (
             <img
               className={`small-card`}
-              // ${isSelectedCard ? "selected-card" : ""}
               src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}
@@ -97,7 +98,6 @@ const App = () => {
           );
         })}
         <br></br>
-        {/* plays selected cards */}
         <button onClick={() => handlePlaySelectedCards(selectedCards)}>
           Play selected cards!
         </button>
