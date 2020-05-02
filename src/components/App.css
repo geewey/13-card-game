@@ -28,3 +28,8 @@
   border-bottom-style: solid;
   padding: 1vh;
 }
+
+.selected-card {
+  border-radius: 6%;
+  border: 1.5px solid red;
+}

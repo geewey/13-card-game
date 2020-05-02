@@ -11,6 +11,7 @@ const suitRankMap = {
 
 const App = () => {
   const [hand, setHand] = useState([]);
+  const [selectedCards, setSelectedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
 
   // logic for dealing a hand of 13 random cards
@@ -41,17 +42,35 @@ const App = () => {
 
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
-    let addToPlayedCards = [...playedCards, card];
-    setPlayedCards([...addToPlayedCards]);
+    // do nothing if card is already in selected cards
+    if (selectedCards.includes(card)) return;
+
+    setSelectedCards([...selectedCards, card]);
+    // add logic to add "selected-class" to className
+  };
+
+  // logic for playing selected cards
+  const handlePlaySelectedCards = () => {
+    console.log("Selected Cards: ", selectedCards);
+
+    let addToPlayedCards = [...playedCards, ...selectedCards];
+    setPlayedCards(addToPlayedCards);
 
     let updatedHand = [...hand];
-    updatedHand = hand.filter((remainingCards) => remainingCards !== card);
+    selectedCards.forEach((selectedCard) => {
+      updatedHand = hand.filter(
+        (remainingCards) => remainingCards !== selectedCard
+      );
+    });
     setHand(updatedHand);
+
+    debugger;
   };
 
   // HeaderContainer for "Deal button" logic
-  const handleDeal = (allCards) => {
+  const handleDealCards = (allCards) => {
     setPlayedCards([]);
+    setSelectedCards([]);
     dealHand(allCards);
   };
 
@@ -59,14 +78,17 @@ const App = () => {
     <div>
       <div className="header-container">
         {/* clears played cards, assigns 13 new random cards */}
-        <button onClick={() => handleDeal(allCards)}>Deal a new hand!</button>
+        <button onClick={() => handleDealCards(allCards)}>
+          Deal a new hand!
+        </button>
       </div>
       <div className="hand-container">
         <p>Your hand (13 random cards)</p>
         {hand.map((card) => {
           return (
             <img
-              className="small-card"
+              className={`small-card`}
+              // ${isSelectedCard ? "selected-card" : ""}
               src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}
@@ -74,6 +96,11 @@ const App = () => {
             />
           );
         })}
+        <br></br>
+        {/* plays selected cards */}
+        <button onClick={() => handlePlaySelectedCards(selectedCards)}>
+          Play selected cards!
+        </button>
       </div>
       <div className="played-cards-container">
         <p>Played cards</p>
