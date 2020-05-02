@@ -2,33 +2,51 @@ import React, { useState } from "react";
 import allCards from "../helpers/cardData";
 import "./App.css";
 
+const suitRankMap = {
+  spades: 1,
+  clubs: 2,
+  diamonds: 3,
+  hearts: 4,
+};
+
 const App = () => {
   const [hand, setHand] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
 
-  // logic for dealing a hand with 13 random cards
+  // logic for dealing a hand of 13 random cards
   const dealHand = (allCards) => {
-    let hand = [];
+    let newHand = [];
     let availableCards = [...allCards];
 
-    while (hand.length < 13) {
+    while (newHand.length < 13) {
       let randomCard =
         availableCards[Math.floor(Math.random() * availableCards.length)];
 
-      hand.push(randomCard);
-      availableCards = availableCards.filter((card) => randomCard !== card);
+      newHand.push(randomCard);
+      availableCards = availableCards.filter(
+        (availableCard) => randomCard !== availableCard
+      );
     }
-    setHand(hand);
+
+    // sort hand by rank aka number
+    newHand.sort((a, b) => {
+      if (a.order !== b.order) {
+        return a.order - b.order;
+      } else {
+        return suitRankMap[a.suit] - suitRankMap[b.suit];
+      }
+    });
+    setHand(newHand);
   };
 
-  // logic for selecting a card
+  // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
     let addToPlayedCards = [...playedCards, card];
     setPlayedCards([...addToPlayedCards]);
 
-    let newHand = [...hand];
-    newHand = hand.filter((remainingCards) => remainingCards !== card);
-    setHand(newHand);
+    let updatedHand = [...hand];
+    updatedHand = hand.filter((remainingCards) => remainingCards !== card);
+    setHand(updatedHand);
   };
 
   // HeaderContainer for "Deal button" logic
@@ -41,7 +59,7 @@ const App = () => {
     <div>
       <div className="header-container">
         {/* clears played cards, assigns 13 new random cards */}
-        <button onClick={() => handleDeal(allCards)}>Deal button</button>
+        <button onClick={() => handleDeal(allCards)}>Deal a new hand!</button>
       </div>
       <div className="hand-container">
         <p>Your hand (13 random cards)</p>
@@ -49,7 +67,7 @@ const App = () => {
           return (
             <img
               className="small-card"
-              src={`/cards/${card.code}.png`}
+              src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}
               onClick={() => handleSelectCard(card)}
@@ -63,7 +81,7 @@ const App = () => {
           return (
             <img
               className="small-card"
-              src={`/cards/${card.code}.png`}
+              src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}
               // onClick={() => handleSelectCard(card)}

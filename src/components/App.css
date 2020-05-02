@@ -19,3 +19,12 @@
   margin: 0.4rem;
   cursor: pointer;
 }
+
+.header-container,
+.hand-container,
+.played-cards-container {
+  border: 1px;
+  border-color: black;
+  border-bottom-style: solid;
+  padding: 1vh;
+}
