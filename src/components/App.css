@@ -17,6 +17,9 @@
   width: 5rem;
   height: auto;
   margin: 0.4rem;
+}
+
+.small-card.hand {
   cursor: pointer;
 }
 

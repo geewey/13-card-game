@@ -87,7 +87,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <>
       <div className="header-container">
         {/* clears played cards, assigns 13 new random cards */}
         <button onClick={() => handleDealCards(allCards)}>
@@ -99,7 +99,7 @@ const App = () => {
         {hand.map((card) => {
           return (
             <img
-              className={`small-card`}
+              className={`small-card hand`}
               src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}
@@ -126,7 +126,7 @@ const App = () => {
           );
         })}
       </div>
-    </div>
+    </>
   );
 };
 
