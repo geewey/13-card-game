@@ -43,9 +43,19 @@ const App = () => {
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
     // do nothing if card is already in selected cards
-    if (selectedCards.includes(card)) return;
+    let alreadySelectedCards = [...selectedCards];
 
-    setSelectedCards([...selectedCards, card]);
+    if (alreadySelectedCards.includes(card)) {
+      // deselect the card
+      alreadySelectedCards = alreadySelectedCards.filter(
+        (alreadySelectedCard) => alreadySelectedCard !== card
+      );
+    } else {
+      // select the card
+      alreadySelectedCards.push(card);
+    }
+
+    setSelectedCards(alreadySelectedCards);
     // add logic to add "selected-class" to className
   };
 
