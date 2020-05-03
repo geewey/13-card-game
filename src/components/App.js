@@ -29,7 +29,7 @@ const App = () => {
       );
     }
 
-    // sort hand by rank aka number
+    // sort hand by rank (per rules of 13 card game)
     newHand.sort((a, b) => {
       if (a.order !== b.order) {
         return a.order - b.order;
@@ -42,11 +42,10 @@ const App = () => {
 
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
-    // do nothing if card is already in selected cards
     let alreadySelectedCards = [...selectedCards];
 
     if (alreadySelectedCards.includes(card)) {
-      // deselect the card
+      // deselect a card if already selected
       alreadySelectedCards = alreadySelectedCards.filter(
         (alreadySelectedCard) => alreadySelectedCard !== card
       );
@@ -56,7 +55,11 @@ const App = () => {
     }
 
     setSelectedCards(alreadySelectedCards);
-    // add logic to add "selected-class" to className
+  };
+
+  // add "selected-class" to className for selected cards
+  const isCardSelected = (card) => {
+    return selectedCards.includes(card);
   };
 
   // logic for playing selected cards
@@ -65,8 +68,7 @@ const App = () => {
     let allPlayedCards = [...selectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
 
-    // iterate selected cards and filter each out of hand
-    // then, set new hand
+    // iterate and filter selected cards out of hand
     let updatedHand = [...hand];
     selectedCards.forEach((selectedCard) => {
       updatedHand = updatedHand.filter(
@@ -99,7 +101,10 @@ const App = () => {
         {hand.map((card) => {
           return (
             <img
-              className={`small-card hand`}
+              className={
+                "small-card hand " +
+                (isCardSelected(card) ? "selected-card" : "")
+              }
               src={`/cards/${card.imgName}.png`}
               alt={card.name}
               key={card.name}

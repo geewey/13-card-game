@@ -33,6 +33,6 @@
 }
 
 .selected-card {
-  border-radius: 6%;
-  border: 1.5px solid red;
+  border-radius: 4%;
+  border: 2px solid red;
 }
