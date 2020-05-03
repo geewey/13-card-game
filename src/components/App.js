@@ -44,6 +44,17 @@ const App = () => {
   const handleSelectCard = (card) => {
     let alreadySelectedCards = [...selectedCards];
 
+    // USE LOGIC BELOW TO CHECK CARD SELECTION!!
+
+    // 1. User can play singles, pairs, triples, or quads
+    if (
+      !(alreadySelectedCards.length === 0) &&
+      card.order !== alreadySelectedCards[0].order
+    )
+      return;
+
+    // USE LOGIC ABOVE TO CHECK CARD SELECTION!!
+
     if (alreadySelectedCards.includes(card)) {
       // deselect a card if already selected
       alreadySelectedCards = alreadySelectedCards.filter(
