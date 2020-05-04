@@ -40,21 +40,23 @@ const App = () => {
     setHand(newHand);
   };
 
+  const isValidCardSelection = (card) => {
+    // USE GAME LOGIC BELOW TO CHECK CARD SELECTION!!
+
+    // 1A. User can play singles
+    if (selectedCards.length === 0) return true;
+
+    // 1B. User can play pairs, triples, or quads
+    if (card.order === selectedCards[0].order) return true;
+  };
+
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
     let alreadySelectedCards = [...selectedCards];
 
-    // USE LOGIC BELOW TO CHECK CARD SELECTION!!
+    if (!isValidCardSelection(card)) return;
 
-    // 1. User can play singles, pairs, triples, or quads
-    if (
-      !(alreadySelectedCards.length === 0) &&
-      card.order !== alreadySelectedCards[0].order
-    )
-      return;
-
-    // USE LOGIC ABOVE TO CHECK CARD SELECTION!!
-
+    // After game logic is fulfilled, follow selection logic
     if (alreadySelectedCards.includes(card)) {
       // deselect a card if already selected
       alreadySelectedCards = alreadySelectedCards.filter(
