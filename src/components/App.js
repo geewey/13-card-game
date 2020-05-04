@@ -73,6 +73,8 @@ const App = () => {
   const handleSelectCard = (card) => {
     let alreadySelectedCards = [...selectedCards];
 
+    if (!isValidCardSelection(card)) return true;
+
     // After game logic is fulfilled, follow selection logic
     if (alreadySelectedCards.includes(card)) {
       // deselect a card if already selected
