@@ -14,6 +14,20 @@ const App = () => {
   const [selectedCards, setSelectedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
 
+  // sort cards by rank (per rules of 13 card game)
+  const sortCards = (hand) => {
+    let newHand = [...hand];
+
+    let sortedNewHand = newHand.sort((a, b) => {
+      if (a.order !== b.order) {
+        return a.order - b.order;
+      } else {
+        return suitRankMap[a.suit] - suitRankMap[b.suit];
+      }
+    });
+    return sortedNewHand;
+  };
+
   // logic for dealing a hand of 13 random cards
   const dealHand = (allCards) => {
     let newHand = [];
@@ -30,14 +44,8 @@ const App = () => {
     }
 
     // sort hand by rank (per rules of 13 card game)
-    newHand.sort((a, b) => {
-      if (a.order !== b.order) {
-        return a.order - b.order;
-      } else {
-        return suitRankMap[a.suit] - suitRankMap[b.suit];
-      }
-    });
-    setHand(newHand);
+    let sortedHand = sortCards(newHand);
+    setHand(sortedHand);
   };
 
   const isValidCardSelection = (card) => {
@@ -48,13 +56,22 @@ const App = () => {
 
     // 1B. User can play pairs, triples, or quads
     if (card.order === selectedCards[0].order) return true;
+
+    // debugger;
+    // 2. User can play runs of 3+ consecutive cards (2s not allowed in run)
+    if (
+      card.order !== 13 &&
+      !selectedCards.map((selectedCard) => selectedCard.order).includes(13) &&
+      selectedCards
+        .map((selectedCard) => Math.abs(selectedCard.order - card.order))
+        .includes(1)
+    )
+      return true;
   };
 
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
     let alreadySelectedCards = [...selectedCards];
-
-    if (!isValidCardSelection(card)) return;
 
     // After game logic is fulfilled, follow selection logic
     if (alreadySelectedCards.includes(card)) {
@@ -70,7 +87,7 @@ const App = () => {
     setSelectedCards(alreadySelectedCards);
   };
 
-  // add "selected-class" to className for selected cards
+  // for selected cards, add "selected-class" to className
   const isCardSelected = (card) => {
     return selectedCards.includes(card);
   };
