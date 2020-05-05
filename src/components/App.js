@@ -49,38 +49,90 @@ const App = () => {
   };
 
   const areSelectedCardsValidToPlay = () => {
-    // USE GAME LOGIC BELOW TO CHECK IF CARD SELECTION IS VALID BEFORE PLAYING!!
+    // USE GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID BEFORE PLAYING!!
 
     let sortedSelectedCards = sortCards(selectedCards);
 
-    const areCardsConsecutive = (arr) => {
+    const areCardsTheSame = (arr) => {
+      if (!arr.every((card) => card.order === arr[0].order)) return false;
+      console.log("cards are the same");
+      return true;
+    };
+
+    const areSinglesConsecutive = (arr) => {
       for (let i = 1; i < arr.length; i++) {
         if (arr[i].order - arr[i - 1].order !== 1) {
           return false;
         }
       }
+      console.log("singles are consecutive");
+      return true;
+    };
+
+    const arePairsConsecutive = (arr) => {
+      for (let i = 1; i < arr.length; i = i + 2) {
+        if (arr[i].order - arr[i - 1].order !== 0) {
+          return false;
+        }
+      }
+      for (let i = 1; i < arr.length - 3; i = i + 2) {
+        if (arr[i + 1].order - arr[i].order !== 1) {
+          return false;
+        }
+      }
+      console.log("pairs are consecutive");
+      return true;
+    };
+
+    const areTriplesConsecutive = (arr) => {
+      // [3, 3, 3, 4, 4, 4, 5, 5, 5]
+      // [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6]; 2, 5, 8, 11 (length 12)
+
+      for (let i = 2; i < arr.length; i = i + 3) {
+        if (
+          arr[i].order - arr[i - 1].order !== 0 &&
+          arr[i].order - arr[i - 2].order !== 0
+        ) {
+          return false;
+        }
+      }
+      for (let i = 2; i < arr.length - 3; i = i + 3) {
+        if (arr[i + 1].order - arr[i].order !== 1) {
+          return false;
+        }
+      }
+      console.log("triples are consecutive");
       return true;
     };
 
     // Valid hands:
     // 1A. any single card
     // if (sortedSelectedCards.length === 0) return true;
-    // 1B. single, pair, triple, quad of same card
+    // 1. any single, pair, triple, quad of same card
+    if (areCardsTheSame(sortedSelectedCards)) return true;
+    // 2. runs of 3+ consecutive singles (2s not allowed in run)
     if (
-      sortedSelectedCards.every(
-        (card) => card.order === sortedSelectedCards[0].order
-      )
-    )
-      return true;
-    // 2. runs of 3+ consecutive cards (2s not allowed in run)
-    if (
+      sortedSelectedCards.length >= 3 &&
       !sortedSelectedCards.some((card) => card.order === 13) &&
-      areCardsConsecutive(sortedSelectedCards) &&
-      sortedSelectedCards.length >= 3
+      areSinglesConsecutive(sortedSelectedCards)
     )
       return true;
 
-    return false;
+    // 3. runs of 3+ consecutive pairs (2s not allowed in run)
+    if (
+      sortedSelectedCards.length >= 6 &&
+      sortedSelectedCards.length % 2 === 0 &&
+      arePairsConsecutive(sortedSelectedCards)
+    )
+      return true;
+
+    // 4. runs of 3+ consecutive triples (2s not allowed in run)
+    if (
+      sortedSelectedCards.length >= 9 &&
+      sortedSelectedCards.length % 3 === 0 &&
+      areTriplesConsecutive(sortedSelectedCards)
+    )
+      return false;
   };
 
   // logic for selecting a card in the hand
