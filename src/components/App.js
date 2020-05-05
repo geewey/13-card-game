@@ -48,41 +48,52 @@ const App = () => {
     setHand(sortedHand);
   };
 
-  const isValidCardSelection = (card) => {
-    // USE GAME LOGIC BELOW TO CHECK CARD SELECTION!!
+  const areSelectedCardsValidToPlay = () => {
+    // USE GAME LOGIC BELOW TO CHECK IF CARD SELECTION IS VALID BEFORE PLAYING!!
 
-    // 1A. User can play singles
-    if (selectedCards.length === 0) return true;
+    let sortedSelectedCards = sortCards(selectedCards);
 
-    // 1B. User can play pairs, triples, or quads
-    if (card.order === selectedCards[0].order) return true;
+    const areCardsConsecutive = (arr) => {
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i].order - arr[i - 1].order !== 1) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-    // debugger;
-    // 2. User can play runs of 3+ consecutive cards (2s not allowed in run)
+    // Valid hands:
+    // 1A. any single card
+    // if (sortedSelectedCards.length === 0) return true;
+    // 1B. single, pair, triple, quad of same card
     if (
-      card.order !== 13 &&
-      !selectedCards.map((selectedCard) => selectedCard.order).includes(13) &&
-      selectedCards
-        .map((selectedCard) => Math.abs(selectedCard.order - card.order))
-        .includes(1)
+      sortedSelectedCards.every(
+        (card) => card.order === sortedSelectedCards[0].order
+      )
     )
       return true;
+    // 2. runs of 3+ consecutive cards (2s not allowed in run)
+    if (
+      !sortedSelectedCards.some((card) => card.order === 13) &&
+      areCardsConsecutive(sortedSelectedCards) &&
+      sortedSelectedCards.length >= 3
+    )
+      return true;
+
+    return false;
   };
 
   // logic for selecting a card in the hand
   const handleSelectCard = (card) => {
     let alreadySelectedCards = [...selectedCards];
 
-    if (!isValidCardSelection(card)) return true;
-
     // After game logic is fulfilled, follow selection logic
+    // deselect if already selected, or else select it
     if (alreadySelectedCards.includes(card)) {
-      // deselect a card if already selected
       alreadySelectedCards = alreadySelectedCards.filter(
         (alreadySelectedCard) => alreadySelectedCard !== card
       );
     } else {
-      // select the card
       alreadySelectedCards.push(card);
     }
 
@@ -96,8 +107,16 @@ const App = () => {
 
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
+    // check if selected cards are valid to play
+    if (!areSelectedCardsValidToPlay()) {
+      console.log("Selected cards is not a valid play!");
+      alert("Selected cards is not a valid play!");
+      return;
+    }
+
     // add selected cards to played cards
-    let allPlayedCards = [...selectedCards, ...playedCards];
+    let sortedSelectedCards = sortCards(selectedCards);
+    let allPlayedCards = [...sortedSelectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
 
     // iterate and filter selected cards out of hand
