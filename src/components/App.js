@@ -85,7 +85,7 @@ const App = () => {
     }
 
     // insert dummy hand here for testing!
-    newHand = testThreeConsecutiveTriples;
+    // newHand = testThreeConsecutiveTriples;
     // sort hand by rank (per rules of 13 card game)
     let sortedHand = sortCards(newHand);
     setHands(sortedHand);
@@ -256,6 +256,7 @@ const App = () => {
   const handleDealCards = (allCards) => {
     setPlayedCards([]);
     setSelectedCards([]);
+    setTypeOfRound("");
     setLastPlayedCards([]);
     dealHand(allCards);
   };
