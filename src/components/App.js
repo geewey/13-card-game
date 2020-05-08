@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import allCards from "../helpers/cardData";
 import "./App.css";
+import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 
 const suitRankMap = {
   spades: 1,
@@ -10,9 +11,49 @@ const suitRankMap = {
 };
 
 const App = () => {
-  const [hand, setHand] = useState([]);
+  const [hands, setHands] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
+  const [typeOfRound, setTypeOfRound] = useState("");
+  const [lastPlayedCards, setLastPlayedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
+
+  const playSingle = () => {
+    setTypeOfRound("single");
+  };
+
+  const playDouble = () => {
+    setTypeOfRound("double");
+  };
+
+  const playTriple = () => {
+    setTypeOfRound("triple");
+  };
+
+  const playQuad = () => {
+    setTypeOfRound("quad");
+  };
+
+  const playSingleRun = () => {
+    setTypeOfRound("singleRun");
+  };
+
+  const playDoubleRun = () => {
+    setTypeOfRound("doubleRun");
+  };
+
+  const playTripleRun = () => {
+    setTypeOfRound("tripleRun");
+  };
+
+  const playMap = {
+    single: playSingle,
+    double: playDouble,
+    triple: playTriple,
+    quad: playQuad,
+    singleRun: playSingleRun,
+    doubleRun: playDoubleRun,
+    tripleRun: playTripleRun,
+  };
 
   // sort cards by rank (per rules of 13 card game)
   const sortCards = (hand) => {
@@ -43,9 +84,11 @@ const App = () => {
       );
     }
 
+    // insert dummy hand here for testing!
+    newHand = testThreeConsecutiveTriples;
     // sort hand by rank (per rules of 13 card game)
     let sortedHand = sortCards(newHand);
-    setHand(sortedHand);
+    setHands(sortedHand);
   };
 
   const areSelectedCardsValidToPlay = () => {
@@ -55,7 +98,23 @@ const App = () => {
 
     const areCardsTheSame = (arr) => {
       if (!arr.every((card) => card.order === arr[0].order)) return false;
+
+      if (arr.length === 1) {
+        playMap["single"]();
+      } else if (arr.length === 2) {
+        playMap["double"]();
+      } else if (arr.length === 3) {
+        playMap["triple"]();
+      } else if (arr.length === 4) {
+        playMap["quad"]();
+      }
       console.log("cards are the same");
+      return true;
+    };
+
+    const areAnyTwosSelected = (arr) => {
+      if (arr.some((card) => card.order === 13)) return false;
+      console.log("no 2s in run");
       return true;
     };
 
@@ -66,10 +125,11 @@ const App = () => {
         }
       }
       console.log("singles are consecutive");
+      playMap["singleRun"]();
       return true;
     };
 
-    const arePairsConsecutive = (arr) => {
+    const areDoublesConsecutive = (arr) => {
       for (let i = 1; i < arr.length; i = i + 2) {
         if (arr[i].order - arr[i - 1].order !== 0) {
           return false;
@@ -80,19 +140,22 @@ const App = () => {
           return false;
         }
       }
-      console.log("pairs are consecutive");
+      console.log("doubles are consecutive");
+      playMap["doubleRun"]();
       return true;
     };
 
     const areTriplesConsecutive = (arr) => {
-      // [3, 3, 3, 4, 4, 4, 5, 5, 5]
-      // [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6]; 2, 5, 8, 11 (length 12)
-
+      // for (let i = 2; i < arr.length; i = i + 3) {
+      //   if (
+      //     arr[i].order - arr[i - 1].order !== 0 &&
+      //     arr[i].order - arr[i - 2].order !== 0
+      //   ) {
+      //     return false;
+      //   }
+      // }
       for (let i = 2; i < arr.length; i = i + 3) {
-        if (
-          arr[i].order - arr[i - 1].order !== 0 &&
-          arr[i].order - arr[i - 2].order !== 0
-        ) {
+        if (!areCardsTheSame([arr[i], arr[i - 1], arr[i - 2]])) {
           return false;
         }
       }
@@ -102,27 +165,30 @@ const App = () => {
         }
       }
       console.log("triples are consecutive");
+      playMap["tripleRun"]();
       return true;
     };
 
     // Valid hands:
     // 1A. any single card
     // if (sortedSelectedCards.length === 0) return true;
-    // 1. any single, pair, triple, quad of same card
+    // 1. any single, double, triple, quad of same card
     if (areCardsTheSame(sortedSelectedCards)) return true;
     // 2. runs of 3+ consecutive singles (2s not allowed in run)
     if (
       sortedSelectedCards.length >= 3 &&
-      !sortedSelectedCards.some((card) => card.order === 13) &&
-      areSinglesConsecutive(sortedSelectedCards)
+      // !sortedSelectedCards.some((card) => card.order === 13) &&
+      areSinglesConsecutive(sortedSelectedCards) &&
+      areAnyTwosSelected(sortedSelectedCards)
     )
       return true;
 
-    // 3. runs of 3+ consecutive pairs (2s not allowed in run)
+    // 3. runs of 3+ consecutive doubles (2s not allowed in run)
     if (
       sortedSelectedCards.length >= 6 &&
       sortedSelectedCards.length % 2 === 0 &&
-      arePairsConsecutive(sortedSelectedCards)
+      areDoublesConsecutive(sortedSelectedCards) &&
+      areAnyTwosSelected(sortedSelectedCards)
     )
       return true;
 
@@ -130,9 +196,10 @@ const App = () => {
     if (
       sortedSelectedCards.length >= 9 &&
       sortedSelectedCards.length % 3 === 0 &&
-      areTriplesConsecutive(sortedSelectedCards)
+      areTriplesConsecutive(sortedSelectedCards) &&
+      areAnyTwosSelected(sortedSelectedCards)
     )
-      return false;
+      return true;
   };
 
   // logic for selecting a card in the hand
@@ -152,7 +219,7 @@ const App = () => {
     setSelectedCards(alreadySelectedCards);
   };
 
-  // for selected cards, add "selected-class" to className
+  // logic for confirming selected cards, add "selected-class" to className
   const isCardSelected = (card) => {
     return selectedCards.includes(card);
   };
@@ -168,17 +235,18 @@ const App = () => {
 
     // add selected cards to played cards
     let sortedSelectedCards = sortCards(selectedCards);
+    setLastPlayedCards(sortedSelectedCards);
     let allPlayedCards = [...sortedSelectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
 
     // iterate and filter selected cards out of hand
-    let updatedHand = [...hand];
+    let updatedHand = [...hands];
     selectedCards.forEach((selectedCard) => {
       updatedHand = updatedHand.filter(
         (remainingCard) => remainingCard !== selectedCard
       );
     });
-    setHand(updatedHand);
+    setHands(updatedHand);
 
     // clear selected cards
     setSelectedCards([]);
@@ -188,6 +256,7 @@ const App = () => {
   const handleDealCards = (allCards) => {
     setPlayedCards([]);
     setSelectedCards([]);
+    setLastPlayedCards([]);
     dealHand(allCards);
   };
 
@@ -201,7 +270,7 @@ const App = () => {
       </div>
       <div className="hand-container">
         <p>Your hand (13 random cards)</p>
-        {hand.map((card) => {
+        {hands.map((card) => {
           return (
             <img
               className={
