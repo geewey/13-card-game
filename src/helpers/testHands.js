@@ -1,4 +1,38 @@
-export default [
+const testThreeConsecutiveTriples = [
+  { name: "4 Spades", rank: 4, order: 2, suit: "spades", imgName: "4s" },
+  { name: "5 Spades", rank: 5, order: 3, suit: "spades", imgName: "5s" },
+  { name: "6 Spades", rank: 6, order: 4, suit: "spades", imgName: "6s" },
+  {
+    name: "4 Diamonds",
+    rank: 4,
+    order: 2,
+    suit: "diamonds",
+    imgName: "4d",
+  },
+  {
+    name: "5 Diamonds",
+    rank: 5,
+    order: 3,
+    suit: "diamonds",
+    imgName: "5d",
+  },
+  {
+    name: "6 Diamonds",
+    rank: 6,
+    order: 4,
+    suit: "diamonds",
+    imgName: "6d",
+  },
+  { name: "4 Hearts", rank: 4, order: 2, suit: "hearts", imgName: "4h" },
+  { name: "5 Hearts", rank: 5, order: 3, suit: "hearts", imgName: "5h" },
+  { name: "6 Hearts", rank: 6, order: 4, suit: "hearts", imgName: "6h" },
+  { name: "7 Hearts", rank: 7, order: 5, suit: "hearts", imgName: "7h" },
+  { name: "8 Hearts", rank: 8, order: 6, suit: "hearts", imgName: "8h" },
+  { name: "9 Hearts", rank: 9, order: 7, suit: "hearts", imgName: "9h" },
+  { name: "10 Hearts", rank: 10, order: 8, suit: "hearts", imgName: "10h" },
+];
+
+const testAllCards = [
   {
     name: "Ace Diamonds",
     rank: 1,
@@ -178,3 +212,5 @@ export default [
     imgName: "13s",
   },
 ];
+
+export { testThreeConsecutiveTriples, testAllCards };
