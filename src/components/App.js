@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import allCards from "../helpers/cardData";
+import HandsContainer from "../containers/HandsContainer";
+import HeaderContainer from "../containers/HeaderContainer";
+import PlayedCardsContainer from "../containers/PlayedCardsContainer";
 import "./App.css";
-import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
+// import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 
 const suitRankMap = {
   spades: 1,
@@ -14,6 +17,7 @@ const App = () => {
   const [hands, setHands] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [typeOfRound, setTypeOfRound] = useState("");
+  const [cardToBeat, setCardToBeat] = useState([]);
   const [lastPlayedCards, setLastPlayedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
 
@@ -56,10 +60,10 @@ const App = () => {
   };
 
   // sort cards by rank (per rules of 13 card game)
-  const sortCards = (hand) => {
-    let newHand = [...hand];
+  const sortCards = (cards) => {
+    let unsortedCards = [...cards];
 
-    let sortedNewHand = newHand.sort((a, b) => {
+    let sortedNewHand = unsortedCards.sort((a, b) => {
       if (a.order !== b.order) {
         return a.order - b.order;
       } else {
@@ -100,21 +104,26 @@ const App = () => {
       if (!arr.every((card) => card.order === arr[0].order)) return false;
 
       if (arr.length === 1) {
+        console.log("played a single");
         playMap["single"]();
       } else if (arr.length === 2) {
+        console.log("played a double");
         playMap["double"]();
       } else if (arr.length === 3) {
+        console.log("played a triple");
         playMap["triple"]();
       } else if (arr.length === 4) {
+        console.log("played a quad");
         playMap["quad"]();
       }
-      console.log("cards are the same");
       return true;
     };
 
     const areAnyTwosSelected = (arr) => {
-      if (arr.some((card) => card.order === 13)) return false;
-      console.log("no 2s in run");
+      if (arr.some((card) => card.order === 13)) {
+        console.log("2s not allowed in run!");
+        return false;
+      }
       return true;
     };
 
@@ -124,7 +133,7 @@ const App = () => {
           return false;
         }
       }
-      console.log("singles are consecutive");
+      console.log("played run of singles, " + arr.length + " cards");
       playMap["singleRun"]();
       return true;
     };
@@ -140,20 +149,12 @@ const App = () => {
           return false;
         }
       }
-      console.log("doubles are consecutive");
+      console.log("played run of doubles, " + arr.length + " cards");
       playMap["doubleRun"]();
       return true;
     };
 
     const areTriplesConsecutive = (arr) => {
-      // for (let i = 2; i < arr.length; i = i + 3) {
-      //   if (
-      //     arr[i].order - arr[i - 1].order !== 0 &&
-      //     arr[i].order - arr[i - 2].order !== 0
-      //   ) {
-      //     return false;
-      //   }
-      // }
       for (let i = 2; i < arr.length; i = i + 3) {
         if (!areCardsTheSame([arr[i], arr[i - 1], arr[i - 2]])) {
           return false;
@@ -164,7 +165,7 @@ const App = () => {
           return false;
         }
       }
-      console.log("triples are consecutive");
+      console.log("played run of triples, " + arr.length + " cards");
       playMap["tripleRun"]();
       return true;
     };
@@ -228,14 +229,15 @@ const App = () => {
   const handlePlaySelectedCards = () => {
     // check if selected cards are valid to play
     if (!areSelectedCardsValidToPlay()) {
-      console.log("Selected cards is not a valid play!");
-      alert("Selected cards is not a valid play!");
+      console.log("Selection is not a valid play!");
+      alert("Selection is not a valid play!");
       return;
     }
 
     // add selected cards to played cards
     let sortedSelectedCards = sortCards(selectedCards);
     setLastPlayedCards(sortedSelectedCards);
+    setCardToBeat(sortedSelectedCards[sortedSelectedCards.length - 1]);
     let allPlayedCards = [...sortedSelectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
 
@@ -253,57 +255,27 @@ const App = () => {
   };
 
   // HeaderContainer for "Deal button" logic
-  const handleDealCards = (allCards) => {
+  // const handleDealCards = (allCards) => {
+  const handleDealCards = () => {
     setPlayedCards([]);
     setSelectedCards([]);
     setTypeOfRound("");
+    setCardToBeat([]);
     setLastPlayedCards([]);
     dealHand(allCards);
   };
 
   return (
     <>
-      <div className="header-container">
-        {/* clears played cards, assigns 13 new random cards */}
-        <button onClick={() => handleDealCards(allCards)}>
-          Deal a new hand!
-        </button>
-      </div>
-      <div className="hand-container">
-        <p>Your hand (13 random cards)</p>
-        {hands.map((card) => {
-          return (
-            <img
-              className={
-                "small-card hand " +
-                (isCardSelected(card) ? "selected-card" : "")
-              }
-              src={`/cards/${card.imgName}.png`}
-              alt={card.name}
-              key={card.name}
-              onClick={() => handleSelectCard(card)}
-            />
-          );
-        })}
-        <br></br>
-        <button onClick={() => handlePlaySelectedCards(selectedCards)}>
-          Play selected cards!
-        </button>
-      </div>
-      <div className="played-cards-container">
-        <p>Played cards</p>
-        {playedCards.map((card) => {
-          return (
-            <img
-              className="small-card"
-              src={`/cards/${card.imgName}.png`}
-              alt={card.name}
-              key={card.name}
-              // onClick={() => handleSelectCard(card)}
-            />
-          );
-        })}
-      </div>
+      <HeaderContainer handleDealCards={handleDealCards} />
+      <HandsContainer
+        hands={hands}
+        selectedCards={selectedCards}
+        isCardSelected={isCardSelected}
+        handleSelectCard={handleSelectCard}
+        handlePlaySelectedCards={handlePlaySelectedCards}
+      />
+      <PlayedCardsContainer playedCards={playedCards} />
     </>
   );
 };
