@@ -75,24 +75,30 @@ const App = () => {
 
   // logic for dealing a hand of 13 random cards
   const dealHand = (allCards) => {
-    let newHand = [];
     let availableCards = [...allCards];
+    let newHands = [];
 
-    while (newHand.length < 13) {
-      let randomCard =
-        availableCards[Math.floor(Math.random() * availableCards.length)];
+    for (let i = 1; i <= 4; i++) {
+      let newHand = [];
 
-      newHand.push(randomCard);
-      availableCards = availableCards.filter(
-        (availableCard) => randomCard !== availableCard
-      );
+      while (newHand.length < 13) {
+        let randomCard =
+          availableCards[Math.floor(Math.random() * availableCards.length)];
+
+        newHand.push(randomCard);
+        availableCards = availableCards.filter(
+          (availableCard) => randomCard !== availableCard
+        );
+      }
+
+      // insert dummy hand here for testing!
+      // newHand = testThreeConsecutiveTriples;
+      // sort hand by rank (per rules of 13 card game)
+      let sortedHand = sortCards(newHand);
+      newHands.push(sortedHand);
     }
-
-    // insert dummy hand here for testing!
-    // newHand = testThreeConsecutiveTriples;
-    // sort hand by rank (per rules of 13 card game)
-    let sortedHand = sortCards(newHand);
-    setHands(sortedHand);
+    setHands(newHands);
+    console.log("dealt new hands");
   };
 
   const areSelectedCardsValidToPlay = () => {

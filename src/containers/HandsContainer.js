@@ -9,18 +9,25 @@ const HandsContainer = ({
 }) => {
   return (
     <div className="hand-container">
-      <p>Your hand (13 random cards)</p>
-      {hands.map((card) => {
+      {hands.map((hand, idx) => {
         return (
-          <img
-            className={
-              "small-card hand " + (isCardSelected(card) ? "selected-card" : "")
-            }
-            src={`/cards/${card.imgName}.png`}
-            alt={card.name}
-            key={card.name}
-            onClick={() => handleSelectCard(card)}
-          />
+          <div key={idx}>
+            <p>{`Player ${idx + 1} Hand`}</p>
+            {hand.map((card) => {
+              return (
+                <img
+                  className={
+                    "small-card hand " +
+                    (isCardSelected(card) ? "selected-card" : "")
+                  }
+                  src={`/cards/${card.imgName}.png`}
+                  alt={card.name}
+                  key={card.name}
+                  onClick={() => handleSelectCard(card)}
+                />
+              );
+            })}
+          </div>
         );
       })}
       <br></br>
