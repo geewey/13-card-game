@@ -260,6 +260,10 @@ const App = () => {
     setSelectedCards([]);
   };
 
+  const displayRules = () => {
+    alert("Click cards, then select 'Play selected cards!'");
+  };
+
   // HeaderContainer for "Deal button" logic
   // const handleDealCards = (allCards) => {
   const handleDealCards = () => {
@@ -273,7 +277,10 @@ const App = () => {
 
   return (
     <>
-      <HeaderContainer handleDealCards={handleDealCards} />
+      <HeaderContainer
+        handleDealCards={handleDealCards}
+        displayRules={displayRules}
+      />
       <HandsContainer
         hands={hands}
         selectedCards={selectedCards}
