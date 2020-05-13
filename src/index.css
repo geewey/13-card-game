@@ -1,5 +1,17 @@
-body {
+/* body {
+  background: url('/imgs/background_tile.png') repeat;
   margin: 0;
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  text-align: center;
+  justify-content: center;
+  min-width: 850px;
+} */
+
+body {
+  background: url("/imgs/background_tile.png") repeat;
+  margin: 0;
+  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;

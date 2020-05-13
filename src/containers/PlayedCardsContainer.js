@@ -8,7 +8,7 @@ const PlayedCardsContainer = ({ playedCards }) => {
         return (
           <img
             className="small-card"
-            src={`/cards/${card.imgName}.png`}
+            src={`/imgs/cards/${card.imgName}.png`}
             alt={card.name}
             key={card.name}
           />

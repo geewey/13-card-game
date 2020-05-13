@@ -20,7 +20,7 @@ const HandsContainer = ({
                     "small-card hand " +
                     (isCardSelected(card) ? "selected-card" : "")
                   }
-                  src={`/cards/${card.imgName}.png`}
+                  src={`/imgs/cards/${card.imgName}.png`}
                   alt={card.name}
                   key={card.name}
                   onClick={() => handleSelectCard(card)}

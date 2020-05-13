@@ -35,4 +35,7 @@
 .selected-card {
   border-radius: 4%;
   border: 2px solid red;
+  width: 5.5rem;
+  height: auto;
+  margin: 0.4rem;
 }

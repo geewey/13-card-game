@@ -17,6 +17,7 @@ const App = () => {
   const [hands, setHands] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [typeOfRound, setTypeOfRound] = useState("");
+  // consider refactoring and deleting cardToBeat
   const [cardToBeat, setCardToBeat] = useState([]);
   const [lastPlayedCards, setLastPlayedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
@@ -226,9 +227,18 @@ const App = () => {
     setSelectedCards(alreadySelectedCards);
   };
 
-  // logic for confirming selected cards, add "selected-class" to className
+  // logic to check if card is selected
   const isCardSelected = (card) => {
     return selectedCards.includes(card);
+  };
+
+  // logic for filtering played cards out of one hand
+  const filterCards = (cards) => {
+    let cardsToFilter = [...cards];
+    let remainingCards = cardsToFilter.filter(
+      (remainingCard) => !isCardSelected(remainingCard)
+    );
+    return remainingCards;
   };
 
   // logic for playing selected cards
@@ -248,13 +258,9 @@ const App = () => {
     setPlayedCards(allPlayedCards);
 
     // iterate and filter selected cards out of hand
-    let updatedHand = [...hands];
-    selectedCards.forEach((selectedCard) => {
-      updatedHand = updatedHand.filter(
-        (remainingCard) => remainingCard !== selectedCard
-      );
-    });
-    setHands(updatedHand);
+    let updatedHands = [...hands];
+    updatedHands = updatedHands.map((hand) => filterCards(hand));
+    setHands(updatedHands);
 
     // clear selected cards
     setSelectedCards([]);
