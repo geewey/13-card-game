@@ -1,19 +1,10 @@
 import React, { useState } from "react";
+import allCards from "../helpers/cardData";
 import HandsContainer from "../containers/HandsContainer";
 import HeaderContainer from "../containers/HeaderContainer";
 import PlayedCardsContainer from "../containers/PlayedCardsContainer";
-import allCards from "../helpers/cardData";
-import {
-  isAnythingSelected,
-  doesFirstPlayerPlay3Spades,
-  areCardsTheSame,
-  areAnyTwosSelected,
-  areSinglesConsecutive,
-  areDoublesConsecutive,
-  areTriplesConsecutive,
-} from "../helpers/rulesData";
-// import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 import "./App.css";
+// import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 
 const suitRankMap = {
   spades: 1,
@@ -22,36 +13,14 @@ const suitRankMap = {
   hearts: 4,
 };
 
-const playersInitialHands = {
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-};
-
 const App = () => {
-  // const [hands, setHands] = useState([]);
-  const [hands, setHands] = useState(playersInitialHands);
+  const [hands, setHands] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [typeOfRound, setTypeOfRound] = useState("");
-  const [activePlayers, setActivePlayers] = useState(["1", "2", "3", "4"]);
-  const [currentPlayer, setCurrentPlayer] = useState("");
   // consider refactoring and deleting cardToBeat
   const [cardToBeat, setCardToBeat] = useState([]);
   const [lastPlayedCards, setLastPlayedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
-
-  const handsValues = () => {
-    return Object.values(hands);
-  };
-
-  const veryFirstTurn = () => {
-    return handsValues().flat().length === 52 ? true : false;
-  };
-
-  const allHandsEmpty = () => {
-    return handsValues().flat().length === 0 ? true : false;
-  };
 
   const playSingle = () => {
     setTypeOfRound("single");
@@ -95,36 +64,29 @@ const App = () => {
   const sortCards = (cards) => {
     let unsortedCards = [...cards];
 
-    let sortedCards = unsortedCards.sort((a, b) => {
+    let sortedNewHand = unsortedCards.sort((a, b) => {
       if (a.order !== b.order) {
         return a.order - b.order;
       } else {
         return suitRankMap[a.suit] - suitRankMap[b.suit];
       }
     });
-    return sortedCards;
-  };
-
-  // set first player
-  const markFirstPlayer = (playerNumber) => {
-    setCurrentPlayer(playerNumber);
+    return sortedNewHand;
   };
 
   // logic for dealing a hand of 13 random cards
   const dealHand = (allCards) => {
     let availableCards = [...allCards];
-    let newHands = {};
+    let newHands = [];
 
     for (let i = 1; i <= 4; i++) {
       let newHand = [];
+
       while (newHand.length < 13) {
         let randomCard =
           availableCards[Math.floor(Math.random() * availableCards.length)];
-        newHand.push(randomCard);
 
-        if (randomCard["name"] === "3 Spades") {
-          markFirstPlayer(i.toString());
-        }
+        newHand.push(randomCard);
         availableCards = availableCards.filter(
           (availableCard) => randomCard !== availableCard
         );
@@ -134,47 +96,100 @@ const App = () => {
       // newHand = testThreeConsecutiveTriples;
       // sort hand by rank (per rules of 13 card game)
       let sortedHand = sortCards(newHand);
-      newHands[[i.toString()]] = sortedHand;
+      newHands.push(sortedHand);
     }
     setHands(newHands);
-    console.log("New game has started!");
+    console.log("dealt new hands");
   };
 
   const areSelectedCardsValidToPlay = () => {
-    let sortedSelectedCards = sortCards(selectedCards);
     // USE GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID BEFORE PLAYING!!
 
-    // Valid hands:
-    // 1. any single, double, triple, quad of same card
-    if (areCardsTheSame(sortedSelectedCards)) {
-      if (sortedSelectedCards.length === 1) {
-        console.log(`Player ${currentPlayer} played a single`);
+    let sortedSelectedCards = sortCards(selectedCards);
+
+    const areCardsTheSame = (arr) => {
+      if (!arr.every((card) => card.order === arr[0].order)) return false;
+
+      if (arr.length === 1) {
+        console.log("played a single");
         playMap["single"]();
-      } else if (sortedSelectedCards.length === 2) {
-        console.log(`Player ${currentPlayer} played a double`);
+      } else if (arr.length === 2) {
+        console.log("played a double");
         playMap["double"]();
-      } else if (sortedSelectedCards.length === 3) {
-        console.log(`Player ${currentPlayer} played a triple`);
+      } else if (arr.length === 3) {
+        console.log("played a triple");
         playMap["triple"]();
-      } else if (sortedSelectedCards.length === 4) {
-        console.log(`Player ${currentPlayer} played a quad`);
+      } else if (arr.length === 4) {
+        console.log("played a quad");
         playMap["quad"]();
       }
       return true;
-    }
+    };
+
+    const areAnyTwosSelected = (arr) => {
+      if (arr.some((card) => card.order === 13)) {
+        console.log("2s not allowed in run!");
+        return false;
+      }
+      return true;
+    };
+
+    const areSinglesConsecutive = (arr) => {
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i].order - arr[i - 1].order !== 1) {
+          return false;
+        }
+      }
+      console.log("played run of singles, " + arr.length + " cards");
+      playMap["singleRun"]();
+      return true;
+    };
+
+    const areDoublesConsecutive = (arr) => {
+      for (let i = 1; i < arr.length; i = i + 2) {
+        if (arr[i].order - arr[i - 1].order !== 0) {
+          return false;
+        }
+      }
+      for (let i = 1; i < arr.length - 3; i = i + 2) {
+        if (arr[i + 1].order - arr[i].order !== 1) {
+          return false;
+        }
+      }
+      console.log("played run of doubles, " + arr.length + " cards");
+      playMap["doubleRun"]();
+      return true;
+    };
+
+    const areTriplesConsecutive = (arr) => {
+      for (let i = 2; i < arr.length; i = i + 3) {
+        if (!areCardsTheSame([arr[i], arr[i - 1], arr[i - 2]])) {
+          return false;
+        }
+      }
+      for (let i = 2; i < arr.length - 3; i = i + 3) {
+        if (arr[i + 1].order - arr[i].order !== 1) {
+          return false;
+        }
+      }
+      console.log("played run of triples, " + arr.length + " cards");
+      playMap["tripleRun"]();
+      return true;
+    };
+
+    // Valid hands:
+    // 1A. any single card
+    // if (sortedSelectedCards.length === 0) return true;
+    // 1. any single, double, triple, quad of same card
+    if (areCardsTheSame(sortedSelectedCards)) return true;
     // 2. runs of 3+ consecutive singles (2s not allowed in run)
     if (
       sortedSelectedCards.length >= 3 &&
       // !sortedSelectedCards.some((card) => card.order === 13) &&
       areSinglesConsecutive(sortedSelectedCards) &&
       areAnyTwosSelected(sortedSelectedCards)
-    ) {
-      console.log(
-        `Player ${currentPlayer} played run of singles, ${sortedSelectedCards.length} cards`
-      );
-      playMap["singleRun"]();
+    )
       return true;
-    }
 
     // 3. runs of 3+ consecutive doubles (2s not allowed in run)
     if (
@@ -182,13 +197,8 @@ const App = () => {
       sortedSelectedCards.length % 2 === 0 &&
       areDoublesConsecutive(sortedSelectedCards) &&
       areAnyTwosSelected(sortedSelectedCards)
-    ) {
-      console.log(
-        `Player ${currentPlayer} played run of doubles, ${sortedSelectedCards.length} cards`
-      );
-      playMap["doubleRun"]();
+    )
       return true;
-    }
 
     // 4. runs of 3+ consecutive triples (2s not allowed in run)
     if (
@@ -196,13 +206,8 @@ const App = () => {
       sortedSelectedCards.length % 3 === 0 &&
       areTriplesConsecutive(sortedSelectedCards) &&
       areAnyTwosSelected(sortedSelectedCards)
-    ) {
-      console.log(
-        `Player ${currentPlayer} played run of triples, ${sortedSelectedCards.length} cards`
-      );
-      playMap["tripleRun"]();
+    )
       return true;
-    }
   };
 
   // logic for selecting a card in the hand
@@ -236,71 +241,8 @@ const App = () => {
     return remainingCards;
   };
 
-  // logic for returning the next active player
-  // (assuming more than 1 active player)
-  const nextPlayer = () => {
-    let currentPlayerNumber = parseInt(currentPlayer);
-    let activePlayersNumbers = activePlayers.map((num) => parseInt(num));
-    let nextPlayer =
-      currentPlayerNumber === Math.max(...activePlayersNumbers)
-        ? Math.min(...activePlayersNumbers)
-        : activePlayersNumbers[activePlayers.indexOf(currentPlayer) + 1];
-    return nextPlayer.toString();
-  };
-
-  // logic for moving to next active player
-  const moveToNextPlayer = () => {
-    setCurrentPlayer(nextPlayer());
-  };
-
-  // logic for current player passing their turn
-  const handlePass = (player) => {
-    if (allHandsEmpty()) {
-      console.log("Please click 'Deal a new hand' to start a game!");
-      alert("Please click 'Deal a new hand' to start a game!");
-      return;
-      // } else if (lengthOfAllHandsValues === 52) {
-    } else if (veryFirstTurn()) {
-      console.log("The first player cannot pass!");
-      alert("The first player cannot pass!");
-      return;
-    }
-
-    console.log(`Player ${player} passed`);
-
-    let remainingPlayers;
-    if (activePlayers.length > 2) {
-      remainingPlayers = activePlayers.filter(
-        (activePlayer) => activePlayer !== player
-      );
-      moveToNextPlayer();
-    } else {
-      console.log(`Player ${nextPlayer()} wins this round`);
-      console.log("New round!");
-      moveToNextPlayer();
-      remainingPlayers = ["1", "2", "3", "4"];
-    }
-    setActivePlayers(remainingPlayers);
-  };
-
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
-    if (!isAnythingSelected(selectedCards)) {
-      console.log("No selection is not a valid play!");
-      alert("No selection is not a valid play!");
-      return;
-    }
-    // check if first hand has 3 of spades!
-    let handsValues = Object.values(hands);
-    if (
-      handsValues.flat().length === 52 &&
-      !doesFirstPlayerPlay3Spades(selectedCards)
-    ) {
-      console.log("First player in game must play a combo with 3 of Spades!");
-      alert("First player in game must play a combo with 3 of Spades!");
-      return;
-    }
-
     // check if selected cards are valid to play
     if (!areSelectedCardsValidToPlay()) {
       console.log("Selection is not a valid play!");
@@ -310,24 +252,18 @@ const App = () => {
 
     // add selected cards to played cards
     let sortedSelectedCards = sortCards(selectedCards);
-    let allPlayedCards = [sortedSelectedCards, ...playedCards];
-    setPlayedCards(allPlayedCards);
-
-    // check for the combo hierarchy to beat
     setLastPlayedCards(sortedSelectedCards);
     setCardToBeat(sortedSelectedCards[sortedSelectedCards.length - 1]);
+    let allPlayedCards = [...sortedSelectedCards, ...playedCards];
+    setPlayedCards(allPlayedCards);
 
     // iterate and filter selected cards out of hand
-    let currentHands = { ...hands };
-    let currentPlayerUpdatedHand = filterCards(hands[parseInt(currentPlayer)]);
-    currentHands[currentPlayer] = currentPlayerUpdatedHand;
-    setHands(currentHands);
+    let updatedHands = [...hands];
+    updatedHands = updatedHands.map((hand) => filterCards(hand));
+    setHands(updatedHands);
 
     // clear selected cards
     setSelectedCards([]);
-
-    // move to the next active player
-    moveToNextPlayer();
   };
 
   const displayRules = () => {
@@ -335,6 +271,7 @@ const App = () => {
   };
 
   // HeaderContainer for "Deal button" logic
+  // const handleDealCards = (allCards) => {
   const handleDealCards = () => {
     setPlayedCards([]);
     setSelectedCards([]);
@@ -351,13 +288,11 @@ const App = () => {
         displayRules={displayRules}
       />
       <HandsContainer
-        handsValues={handsValues()}
+        hands={hands}
         selectedCards={selectedCards}
         isCardSelected={isCardSelected}
         handleSelectCard={handleSelectCard}
         handlePlaySelectedCards={handlePlaySelectedCards}
-        currentPlayer={currentPlayer}
-        handlePass={handlePass}
       />
       <PlayedCardsContainer playedCards={playedCards} />
     </>
