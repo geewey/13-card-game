@@ -37,7 +37,7 @@ const App = () => {
   const [activePlayers, setActivePlayers] = useState(["1", "2", "3", "4"]);
   const [currentPlayer, setCurrentPlayer] = useState("");
   // consider refactoring and deleting cardToBeat
-  const [cardToBeat, setCardToBeat] = useState([]);
+  const [cardToBeat, setCardToBeat] = useState("");
   const [lastPlayedCards, setLastPlayedCards] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
 
@@ -103,6 +103,14 @@ const App = () => {
       }
     });
     return sortedCards;
+  };
+
+  const isTheComboBigger = (topCard) => {
+    if (topCard.order !== cardToBeat.order) {
+      return topCard.order > cardToBeat.order;
+    } else {
+      return suitRankMap[topCard.suit] > suitRankMap[cardToBeat.suit];
+    }
   };
 
   // set first player
@@ -278,6 +286,8 @@ const App = () => {
       console.log(`Player ${nextPlayer()} wins this round`);
       console.log("New round!");
       moveToNextPlayer();
+      setCardToBeat("");
+      setTypeOfRound("");
       remainingPlayers = ["1", "2", "3", "4"];
     }
     setActivePlayers(remainingPlayers);
@@ -291,20 +301,26 @@ const App = () => {
       return;
     }
     // check if first hand has 3 of spades!
-    let handsValues = Object.values(hands);
-    if (
-      handsValues.flat().length === 52 &&
-      !doesFirstPlayerPlay3Spades(selectedCards)
-    ) {
+    if (veryFirstTurn() && !doesFirstPlayerPlay3Spades(selectedCards)) {
       console.log("First player in game must play a combo with 3 of Spades!");
       alert("First player in game must play a combo with 3 of Spades!");
       return;
     }
 
-    // check if selected cards are valid to play
+    // check if selected cards are valid combo to play
     if (!areSelectedCardsValidToPlay()) {
       console.log("Selection is not a valid play!");
       alert("Selection is not a valid play!");
+      return;
+    }
+
+    // check if selected combo is larger than current combo to beat
+    if (
+      cardToBeat !== "" &&
+      !isTheComboBigger(selectedCards[selectedCards.length - 1])
+    ) {
+      console.log("Selection must be larger than current combo to beat");
+      alert("Selection must be larger than current combo to beat");
       return;
     }
 
@@ -339,7 +355,7 @@ const App = () => {
     setPlayedCards([]);
     setSelectedCards([]);
     setTypeOfRound("");
-    setCardToBeat([]);
+    setCardToBeat("");
     setLastPlayedCards([]);
     dealHand(allCards);
   };
