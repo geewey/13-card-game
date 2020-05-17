@@ -1,3 +1,7 @@
+.hidden {
+  display: none;
+}
+
 .cards {
   overflow-x: scroll;
   min-height: 300px;
