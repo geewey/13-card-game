@@ -58,12 +58,59 @@ const triplesAreConsecutive = (arr) => {
   return true;
 };
 
+const comboIsASingle = (cards) => {
+  return cards.length === 1;
+};
+const comboIsADouble = (cards) => {
+  return cards.length === 2 && cardsAreSame(cards);
+};
+const comboIsATriple = (cards) => {
+  return cards.length === 3 && cardsAreSame(cards);
+};
+const comboIsAQuad = (cards) => {
+  return cards.length === 4 && cardsAreSame(cards);
+};
+const comboIsRunOfSingles = (cards) => {
+  return (
+    cards.length >= 3 &&
+    singlesAreConsecutive(cards) &&
+    noTwosAreSelected(cards)
+  );
+};
+const comboIsRunOfDoubles = (cards) => {
+  return (
+    cards.length >= 6 &&
+    cards.length % 2 === 0 &&
+    doublesAreConsecutive(cards) &&
+    noTwosAreSelected(cards)
+  );
+};
+const comboIsRunOfTriples = (cards) => {
+  return (
+    cards.length >= 9 &&
+    cards.length % 3 === 0 &&
+    triplesAreConsecutive(cards) &&
+    noTwosAreSelected(cards)
+  );
+};
+
+// export {
+//   someCardsAreSelected,
+//   firstPlayerPlays3Spades,
+//   cardsAreSame,
+//   noTwosAreSelected,
+//   singlesAreConsecutive,
+//   doublesAreConsecutive,
+//   triplesAreConsecutive,
+// };
 export {
   someCardsAreSelected,
   firstPlayerPlays3Spades,
-  cardsAreSame,
-  noTwosAreSelected,
-  singlesAreConsecutive,
-  doublesAreConsecutive,
-  triplesAreConsecutive,
+  comboIsASingle,
+  comboIsADouble,
+  comboIsATriple,
+  comboIsAQuad,
+  comboIsRunOfSingles,
+  comboIsRunOfDoubles,
+  comboIsRunOfTriples,
 };
