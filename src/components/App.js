@@ -4,13 +4,13 @@ import HeaderContainer from "../containers/HeaderContainer";
 import PlayedCardsContainer from "../containers/PlayedCardsContainer";
 import allCards from "../helpers/cardData";
 import {
-  isAnythingSelected,
-  doesFirstPlayerPlay3Spades,
-  areCardsTheSame,
-  areAnyTwosSelected,
-  areSinglesConsecutive,
-  areDoublesConsecutive,
-  areTriplesConsecutive,
+  someCardsAreSelected,
+  firstPlayerPlays3Spades,
+  cardsAreSame,
+  noTwosAreSelected,
+  singlesAreConsecutive,
+  doublesAreConsecutive,
+  triplesAreConsecutive,
 } from "../helpers/rulesData";
 // import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 import "./App.css";
@@ -38,8 +38,14 @@ const App = () => {
   const [currentPlayer, setCurrentPlayer] = useState("");
   // consider refactoring and deleting cardToBeat
   const [cardToBeat, setCardToBeat] = useState("");
-  const [lastPlayedCards, setLastPlayedCards] = useState([]);
+  const [lastPlayedCardsInRound, setLastPlayedCardsInRound] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
+
+  const setNewRound = () => {
+    setTypeOfRound("");
+    setLastPlayedCardsInRound([]);
+    setCardToBeat("");
+  };
 
   const handsValues = () => {
     return Object.values(hands);
@@ -138,8 +144,6 @@ const App = () => {
         );
       }
 
-      // insert dummy hand here for testing!
-      // newHand = testThreeConsecutiveTriples;
       // sort hand by rank (per rules of 13 card game)
       let sortedHand = sortCards(newHand);
       newHands[[i.toString()]] = sortedHand;
@@ -148,13 +152,13 @@ const App = () => {
     console.log("New game has started!");
   };
 
-  const areSelectedCardsValidToPlay = () => {
+  const areSelectedCardsValidCombo = () => {
     let sortedSelectedCards = sortCards(selectedCards);
-    // USE GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID BEFORE PLAYING!!
 
-    // Valid hands:
+    // GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID COMBO BEFORE PLAYING!!
+    // Valid combos:
     // 1. any single, double, triple, quad of same card
-    if (areCardsTheSame(sortedSelectedCards)) {
+    if (cardsAreSame(sortedSelectedCards)) {
       if (sortedSelectedCards.length === 1) {
         console.log(`Player ${currentPlayer} played a single`);
         playMap["single"]();
@@ -173,9 +177,8 @@ const App = () => {
     // 2. runs of 3+ consecutive singles (2s not allowed in run)
     if (
       sortedSelectedCards.length >= 3 &&
-      // !sortedSelectedCards.some((card) => card.order === 13) &&
-      areSinglesConsecutive(sortedSelectedCards) &&
-      areAnyTwosSelected(sortedSelectedCards)
+      singlesAreConsecutive(sortedSelectedCards) &&
+      noTwosAreSelected(sortedSelectedCards)
     ) {
       console.log(
         `Player ${currentPlayer} played run of singles, ${sortedSelectedCards.length} cards`
@@ -188,8 +191,8 @@ const App = () => {
     if (
       sortedSelectedCards.length >= 6 &&
       sortedSelectedCards.length % 2 === 0 &&
-      areDoublesConsecutive(sortedSelectedCards) &&
-      areAnyTwosSelected(sortedSelectedCards)
+      doublesAreConsecutive(sortedSelectedCards) &&
+      noTwosAreSelected(sortedSelectedCards)
     ) {
       console.log(
         `Player ${currentPlayer} played run of doubles, ${sortedSelectedCards.length} cards`
@@ -202,8 +205,8 @@ const App = () => {
     if (
       sortedSelectedCards.length >= 9 &&
       sortedSelectedCards.length % 3 === 0 &&
-      areTriplesConsecutive(sortedSelectedCards) &&
-      areAnyTwosSelected(sortedSelectedCards)
+      triplesAreConsecutive(sortedSelectedCards) &&
+      noTwosAreSelected(sortedSelectedCards)
     ) {
       console.log(
         `Player ${currentPlayer} played run of triples, ${sortedSelectedCards.length} cards`
@@ -286,31 +289,41 @@ const App = () => {
       console.log(`Player ${nextPlayer()} wins this round`);
       console.log("New round!");
       moveToNextPlayer();
-      setCardToBeat("");
-      setTypeOfRound("");
+      setNewRound();
       remainingPlayers = ["1", "2", "3", "4"];
     }
+    setSelectedCards([]);
     setActivePlayers(remainingPlayers);
   };
 
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
-    if (!isAnythingSelected(selectedCards)) {
+    if (!someCardsAreSelected(selectedCards)) {
       console.log("No selection is not a valid play!");
       alert("No selection is not a valid play!");
       return;
     }
     // check if first hand has 3 of spades!
-    if (veryFirstTurn() && !doesFirstPlayerPlay3Spades(selectedCards)) {
+    if (veryFirstTurn() && !firstPlayerPlays3Spades(selectedCards)) {
       console.log("First player in game must play a combo with 3 of Spades!");
       alert("First player in game must play a combo with 3 of Spades!");
       return;
     }
 
+    // check to check selected combo length is same as round type
+    if (
+      lastPlayedCardsInRound.length !== 0 &&
+      selectedCards.length !== lastPlayedCardsInRound.length
+    ) {
+      console.log("Selected type of combo is not the same as round type!");
+      alert("Selected type of combo is not the same as round type!");
+      return false;
+    }
+
     // check if selected cards are valid combo to play
-    if (!areSelectedCardsValidToPlay()) {
-      console.log("Selection is not a valid play!");
-      alert("Selection is not a valid play!");
+    if (!areSelectedCardsValidCombo()) {
+      console.log("Selection is not a valid combo!");
+      alert("Selection is not a valid combo!");
       return;
     }
 
@@ -319,8 +332,12 @@ const App = () => {
       cardToBeat !== "" &&
       !isTheComboBigger(selectedCards[selectedCards.length - 1])
     ) {
-      console.log("Selection must be larger than current combo to beat");
-      alert("Selection must be larger than current combo to beat");
+      console.log(
+        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
+      );
+      alert(
+        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
+      );
       return;
     }
 
@@ -330,7 +347,7 @@ const App = () => {
     setPlayedCards(allPlayedCards);
 
     // check for the combo hierarchy to beat
-    setLastPlayedCards(sortedSelectedCards);
+    setLastPlayedCardsInRound(sortedSelectedCards);
     setCardToBeat(sortedSelectedCards[sortedSelectedCards.length - 1]);
 
     // iterate and filter selected cards out of hand
@@ -354,9 +371,7 @@ const App = () => {
   const handleDealCards = () => {
     setPlayedCards([]);
     setSelectedCards([]);
-    setTypeOfRound("");
-    setCardToBeat("");
-    setLastPlayedCards([]);
+    setNewRound();
     dealHand(allCards);
   };
 

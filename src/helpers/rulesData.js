@@ -1,19 +1,19 @@
-const isAnythingSelected = (arr) => {
+const someCardsAreSelected = (arr) => {
   if (arr.length === 0) return false;
   return true;
 };
 
-const doesFirstPlayerPlay3Spades = (arr) => {
+const firstPlayerPlays3Spades = (arr) => {
   if (!arr.some((card) => card.name === "3 Spades")) return false;
   return true;
 };
 
-const areCardsTheSame = (arr) => {
+const cardsAreSame = (arr) => {
   if (!arr.every((card) => card.order === arr[0].order)) return false;
   return true;
 };
 
-const areAnyTwosSelected = (arr) => {
+const noTwosAreSelected = (arr) => {
   if (arr.some((card) => card.order === 13)) {
     console.log("2s not allowed in run!");
     return false;
@@ -21,7 +21,7 @@ const areAnyTwosSelected = (arr) => {
   return true;
 };
 
-const areSinglesConsecutive = (arr) => {
+const singlesAreConsecutive = (arr) => {
   for (let i = 1; i < arr.length; i++) {
     if (arr[i].order - arr[i - 1].order !== 1) {
       return false;
@@ -30,7 +30,7 @@ const areSinglesConsecutive = (arr) => {
   return true;
 };
 
-const areDoublesConsecutive = (arr) => {
+const doublesAreConsecutive = (arr) => {
   for (let i = 1; i < arr.length; i = i + 2) {
     if (arr[i].order - arr[i - 1].order !== 0) {
       return false;
@@ -44,9 +44,9 @@ const areDoublesConsecutive = (arr) => {
   return true;
 };
 
-const areTriplesConsecutive = (arr) => {
+const triplesAreConsecutive = (arr) => {
   for (let i = 2; i < arr.length; i = i + 3) {
-    if (!areCardsTheSame([arr[i], arr[i - 1], arr[i - 2]])) {
+    if (!cardsAreSame([arr[i], arr[i - 1], arr[i - 2]])) {
       return false;
     }
   }
@@ -59,11 +59,11 @@ const areTriplesConsecutive = (arr) => {
 };
 
 export {
-  isAnythingSelected,
-  doesFirstPlayerPlay3Spades,
-  areCardsTheSame,
-  areAnyTwosSelected,
-  areSinglesConsecutive,
-  areDoublesConsecutive,
-  areTriplesConsecutive,
+  someCardsAreSelected,
+  firstPlayerPlays3Spades,
+  cardsAreSame,
+  noTwosAreSelected,
+  singlesAreConsecutive,
+  doublesAreConsecutive,
+  triplesAreConsecutive,
 };
