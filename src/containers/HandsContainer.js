@@ -1,18 +1,25 @@
 import React from "react";
 
 const HandsContainer = ({
-  hands,
+  // hands,
+  handsValues,
   selectedCards,
   isCardSelected,
   handleSelectCard,
   handlePlaySelectedCards,
+  currentPlayer,
+  handlePass,
 }) => {
   return (
     <div className="hand-container">
-      {hands.map((hand, idx) => {
+      {handsValues.map((hand, idx) => {
+        let playerNumber = (idx + 1).toString();
         return (
-          <div key={idx}>
-            <p>{`Player ${idx + 1} Hand`}</p>
+          <div
+            key={playerNumber}
+            className={currentPlayer !== playerNumber ? "hidden" : ""}
+          >
+            <h4>{`Player ${playerNumber} Hand`}</h4>
             {hand.map((card) => {
               return (
                 <img
@@ -34,6 +41,7 @@ const HandsContainer = ({
       <button onClick={() => handlePlaySelectedCards(selectedCards)}>
         Play selected cards!
       </button>
+      <button onClick={() => handlePass(currentPlayer)}>Pass this round</button>
     </div>
   );
 };
