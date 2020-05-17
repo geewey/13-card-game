@@ -1,6 +1,5 @@
 const someCardsAreSelected = (arr) => {
-  if (arr.length === 0) return false;
-  return true;
+  return arr.length > 0 ? true : false;
 };
 
 const firstPlayerPlays3Spades = (arr) => {
@@ -58,6 +57,11 @@ const triplesAreConsecutive = (arr) => {
   return true;
 };
 
+// Valid combos:
+// 1. any single, double, triple, quad of same card
+// 2. runs of 3+ consecutive singles (2s not allowed in run)
+// 3. runs of 3+ consecutive doubles (2s not allowed in run)
+// 4. runs of 3+ consecutive triples (2s not allowed in run)
 const comboIsASingle = (cards) => {
   return cards.length === 1;
 };
@@ -99,9 +103,10 @@ const comboOfSelectedCards = (cards) => {
   if (comboIsADouble(cards)) return "double";
   if (comboIsATriple(cards)) return "triple";
   if (comboIsAQuad(cards)) return "quad";
-  if (comboIsRunOfSingles(cards)) return "singleRun";
-  if (comboIsRunOfDoubles(cards)) return "doubleRun";
-  if (comboIsRunOfTriples(cards)) return "tripleRun";
+  if (comboIsRunOfSingles(cards)) return "single run";
+  if (comboIsRunOfDoubles(cards)) return "double run";
+  if (comboIsRunOfTriples(cards)) return "triple run";
+  return false;
 };
 
 export {

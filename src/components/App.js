@@ -6,16 +6,8 @@ import allCards from "../helpers/cardData";
 import {
   someCardsAreSelected,
   firstPlayerPlays3Spades,
-  comboIsASingle,
-  comboIsADouble,
-  comboIsATriple,
-  comboIsAQuad,
-  comboIsRunOfSingles,
-  comboIsRunOfDoubles,
-  comboIsRunOfTriples,
   comboOfSelectedCards,
 } from "../helpers/rulesData";
-// import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 import "./App.css";
 
 const suitRankMap = {
@@ -31,6 +23,8 @@ const playersInitialHands = {
   "3": [],
   "4": [],
 };
+
+let currentPlayers = ["1", "2", "3", "4"];
 
 const App = () => {
   const [hands, setHands] = useState(playersInitialHands);
@@ -65,42 +59,12 @@ const App = () => {
     return lastPlayedCardsInRound.length === 0 && cardToBeat === "";
   };
 
-  const playSingle = () => {
-    setTypeOfRound("single");
-  };
-
-  const playDouble = () => {
-    setTypeOfRound("double");
-  };
-
-  const playTriple = () => {
-    setTypeOfRound("triple");
-  };
-
-  const playQuad = () => {
-    setTypeOfRound("quad");
-  };
-
-  const playSingleRun = () => {
-    setTypeOfRound("singleRun");
-  };
-
-  const playDoubleRun = () => {
-    setTypeOfRound("doubleRun");
-  };
-
-  const playTripleRun = () => {
-    setTypeOfRound("tripleRun");
-  };
-
-  const playMap = {
-    single: playSingle,
-    double: playDouble,
-    triple: playTriple,
-    quad: playQuad,
-    singleRun: playSingleRun,
-    doubleRun: playDoubleRun,
-    tripleRun: playTripleRun,
+  // sets combo type
+  const playCombo = (type) => {
+    setTypeOfRound(type);
+    console.log(
+      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} cards`
+    );
   };
 
   // sort cards by rank (per rules of 13 card game)
@@ -156,49 +120,9 @@ const App = () => {
   const selectedCardsAreValidCombo = () => {
     let sortedSelectedCards = sortCards(selectedCards);
 
-    // GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID COMBO BEFORE PLAYING!!
-    // Valid combos:
-    // 1. any single, double, triple, quad of same card
-    // 2. runs of 3+ consecutive singles (2s not allowed in run)
-    // 3. runs of 3+ consecutive doubles (2s not allowed in run)
-    // 4. runs of 3+ consecutive triples (2s not allowed in run)
-
-    if (comboIsASingle(sortedSelectedCards)) {
-      console.log(`Player ${currentPlayer} played a single`);
-      playMap["single"]();
-      return true;
-    } else if (comboIsADouble(sortedSelectedCards)) {
-      console.log(`Player ${currentPlayer} played a double`);
-      playMap["double"]();
-      return true;
-    } else if (comboIsATriple(sortedSelectedCards)) {
-      console.log(`Player ${currentPlayer} played a triple`);
-      playMap["triple"]();
-      return true;
-    } else if (comboIsAQuad(sortedSelectedCards)) {
-      console.log(`Player ${currentPlayer} played a quad`);
-      playMap["quad"]();
-      return true;
-    } else if (comboIsRunOfSingles(sortedSelectedCards)) {
-      console.log(
-        `Player ${currentPlayer} played run of singles, ${sortedSelectedCards.length} cards`
-      );
-      playMap["singleRun"]();
-      return true;
-    } else if (comboIsRunOfDoubles(sortedSelectedCards)) {
-      console.log(
-        `Player ${currentPlayer} played run of doubles, ${sortedSelectedCards.length} cards`
-      );
-      playMap["doubleRun"]();
-      return true;
-    } else if (comboIsRunOfTriples(sortedSelectedCards)) {
-      console.log(
-        `Player ${currentPlayer} played run of triples, ${sortedSelectedCards.length} cards`
-      );
-      playMap["tripleRun"]();
-      return true;
-    }
-    return false;
+    // rulesData checks if selected cards are valid combo before playing
+    let comboName = comboOfSelectedCards(sortedSelectedCards);
+    return typeof comboName === "string" ? true : false;
   };
 
   // logic for selecting a card in the hand
@@ -216,7 +140,7 @@ const App = () => {
     setSelectedCards(alreadySelectedCards);
   };
 
-  // logic to check if card is selected
+  // logic to return boolean, whether card is selected
   const isCardSelected = (card) => {
     return selectedCards.includes(card);
   };
@@ -275,7 +199,7 @@ const App = () => {
       console.log(`Player ${nextPlayer()} wins this round. New round!`);
       moveToNextPlayer();
       setNewRound();
-      remainingPlayers = ["1", "2", "3", "4"];
+      remainingPlayers = currentPlayers;
     }
     setSelectedCards([]);
     setActivePlayers(remainingPlayers);
@@ -292,13 +216,14 @@ const App = () => {
 
   // logic to check combo matches round type
   const selectedComboMatchesRoundType = () => {
+    let currentCombo = comboOfSelectedCards(selectedCards);
     if (
-      selectedCards.length !== lastPlayedCardsInRound.length &&
-      typeOfRound !== comboOfSelectedCards(selectedCards)
+      selectedCards.length === lastPlayedCardsInRound.length &&
+      typeOfRound === currentCombo
     ) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   };
 
   // logic for playing selected cards
@@ -347,6 +272,7 @@ const App = () => {
     let sortedSelectedCards = sortCards(selectedCards);
     let allPlayedCards = [sortedSelectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
+    playCombo(comboOfSelectedCards(sortedSelectedCards));
 
     // sets the history for combo to beat
     setLastPlayedCardsInRound(sortedSelectedCards);
