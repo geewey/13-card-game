@@ -13,6 +13,7 @@ import {
   comboIsRunOfSingles,
   comboIsRunOfDoubles,
   comboIsRunOfTriples,
+  comboOfSelectedCards,
 } from "../helpers/rulesData";
 // import { testThreeConsecutiveTriples } from "../helpers/testHands.js";
 import "./App.css";
@@ -58,6 +59,10 @@ const App = () => {
 
   const allHandsEmpty = () => {
     return handsValues().flat().length === 0 ? true : false;
+  };
+
+  const isNewRound = () => {
+    return lastPlayedCardsInRound.length === 0 && cardToBeat === "";
   };
 
   const playSingle = () => {
@@ -112,14 +117,6 @@ const App = () => {
     return sortedCards;
   };
 
-  const isTheComboBigger = (topCard) => {
-    if (topCard.order !== cardToBeat.order) {
-      return topCard.order > cardToBeat.order;
-    } else {
-      return suitRankMap[topCard.suit] > suitRankMap[cardToBeat.suit];
-    }
-  };
-
   // set first player
   const markFirstPlayer = (playerNumber) => {
     setCurrentPlayer(playerNumber);
@@ -129,6 +126,7 @@ const App = () => {
   const dealHand = (allCards) => {
     let availableCards = [...allCards];
     let newHands = {};
+    let firstPlayer = "";
 
     for (let i = 1; i <= 4; i++) {
       let newHand = [];
@@ -139,6 +137,7 @@ const App = () => {
 
         if (randomCard["name"] === "3 Spades") {
           markFirstPlayer(i.toString());
+          firstPlayer = i.toString();
         }
         availableCards = availableCards.filter(
           (availableCard) => randomCard !== availableCard
@@ -151,9 +150,10 @@ const App = () => {
     }
     setHands(newHands);
     console.log("New game has started!");
+    console.log(`Player ${firstPlayer} has 3 of Spades and goes first!`);
   };
 
-  const areSelectedCardsValidCombo = () => {
+  const selectedCardsAreValidCombo = () => {
     let sortedSelectedCards = sortCards(selectedCards);
 
     // GAME LOGIC TO CHECK IF SELECTED CARDS ARE VALID COMBO BEFORE PLAYING!!
@@ -198,6 +198,7 @@ const App = () => {
       playMap["tripleRun"]();
       return true;
     }
+    return false;
   };
 
   // logic for selecting a card in the hand
@@ -252,7 +253,6 @@ const App = () => {
       console.log("Please click 'Deal a new hand' to start a game!");
       alert("Please click 'Deal a new hand' to start a game!");
       return;
-      // } else if (lengthOfAllHandsValues === 52) {
     } else if (veryFirstTurn()) {
       console.log(
         "The first player cannot pass! Please select and play a combo that includes 3 of spades."
@@ -272,8 +272,7 @@ const App = () => {
       );
       moveToNextPlayer();
     } else {
-      console.log(`Player ${nextPlayer()} wins this round`);
-      console.log("New round!");
+      console.log(`Player ${nextPlayer()} wins this round. New round!`);
       moveToNextPlayer();
       setNewRound();
       remainingPlayers = ["1", "2", "3", "4"];
@@ -282,9 +281,25 @@ const App = () => {
     setActivePlayers(remainingPlayers);
   };
 
-  // const selectedComboIsValidForRound = (selectedCards, lastPlayedCardsInRound) => {
-  //   (cardsAreTheSame(selectedCards) && cardsAreTheSame(lastPlayedCardsInRound)
-  // }
+  // logic to check if combo is bigger before playing
+  const isSelectedComboBigger = (topCard) => {
+    if (topCard.order !== cardToBeat.order) {
+      return topCard.order > cardToBeat.order;
+    } else {
+      return suitRankMap[topCard.suit] > suitRankMap[cardToBeat.suit];
+    }
+  };
+
+  // logic to check combo matches round type
+  const selectedComboMatchesRoundType = () => {
+    if (
+      selectedCards.length !== lastPlayedCardsInRound.length &&
+      typeOfRound !== comboOfSelectedCards(selectedCards)
+    ) {
+      return false;
+    }
+    return true;
+  };
 
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
@@ -300,18 +315,8 @@ const App = () => {
       return;
     }
 
-    // check to check selected combo length is same as round type
-    if (
-      lastPlayedCardsInRound.length !== 0 &&
-      selectedCards.length !== lastPlayedCardsInRound.length
-    ) {
-      console.log("Selected type of combo is not the same as round type!");
-      alert("Selected type of combo is not the same as round type!");
-      return false;
-    }
-
     // check if selected cards are valid combo to play
-    if (!areSelectedCardsValidCombo()) {
+    if (!selectedCardsAreValidCombo()) {
       console.log("Selection is not a valid combo!");
       alert("Selection is not a valid combo!");
       return;
@@ -319,8 +324,8 @@ const App = () => {
 
     // check if selected combo is larger than current combo to beat
     if (
-      cardToBeat !== "" &&
-      !isTheComboBigger(selectedCards[selectedCards.length - 1])
+      !isNewRound() &&
+      !isSelectedComboBigger(selectedCards[selectedCards.length - 1])
     ) {
       console.log(
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
@@ -328,6 +333,13 @@ const App = () => {
       alert(
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
       );
+      return;
+    }
+
+    // check to check selected combo is same as round type
+    if (!isNewRound() && !selectedComboMatchesRoundType()) {
+      console.log("Selected type of combo is not the same as round type!");
+      alert("Selected type of combo is not the same as round type!");
       return;
     }
 

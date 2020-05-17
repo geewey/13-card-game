@@ -94,15 +94,16 @@ const comboIsRunOfTriples = (cards) => {
   );
 };
 
-// export {
-//   someCardsAreSelected,
-//   firstPlayerPlays3Spades,
-//   cardsAreSame,
-//   noTwosAreSelected,
-//   singlesAreConsecutive,
-//   doublesAreConsecutive,
-//   triplesAreConsecutive,
-// };
+const comboOfSelectedCards = (cards) => {
+  if (comboIsASingle(cards)) return "single";
+  if (comboIsADouble(cards)) return "double";
+  if (comboIsATriple(cards)) return "triple";
+  if (comboIsAQuad(cards)) return "quad";
+  if (comboIsRunOfSingles(cards)) return "singleRun";
+  if (comboIsRunOfDoubles(cards)) return "doubleRun";
+  if (comboIsRunOfTriples(cards)) return "tripleRun";
+};
+
 export {
   someCardsAreSelected,
   firstPlayerPlays3Spades,
@@ -113,4 +114,5 @@ export {
   comboIsRunOfSingles,
   comboIsRunOfDoubles,
   comboIsRunOfTriples,
+  comboOfSelectedCards,
 };
