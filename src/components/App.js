@@ -52,6 +52,10 @@ const App = () => {
     return playersHandsValues().flat().length === 0 ? true : false;
   };
 
+  const isPlayerHandEmpty = (player) => {
+    return playersHands[player].length === 0;
+  };
+
   const isNewRound = () => {
     return lastPlayedCardsInRound.length === 0 ? true : false;
   };
@@ -148,6 +152,7 @@ const App = () => {
     } else {
       alreadySelectedCards.push(card);
     }
+    alreadySelectedCards = sortCards(alreadySelectedCards);
     setSelectedCards(alreadySelectedCards);
   };
 
@@ -180,6 +185,24 @@ const App = () => {
   // logic for moving to next active player
   const moveToNextPlayer = () => {
     setCurrentPlayer(nextPlayer());
+  };
+
+  // logic for returning array of player numbers who have cards in hand
+  const remainingPlayersWithCards = () => {
+    let remainingPlayersArray = [];
+    for (const playerNumber in playersHands) {
+      if (!isPlayerHandEmpty(playerNumber)) {
+        remainingPlayersArray.push(playerNumber);
+      }
+    }
+
+    let sortedRemainingPlayersArrayNum = remainingPlayersArray
+      .map((playerNum) => parseInt(playerNum))
+      .sort((a, b) => a - b);
+    remainingPlayersArray = sortedRemainingPlayersArrayNum.map((playerNum) =>
+      playerNum.toString()
+    );
+    return remainingPlayersArray;
   };
 
   // logic for current player passing their turn
@@ -221,14 +244,15 @@ const App = () => {
       moveToNextPlayer();
       setNewRound();
       // NEED TO FIX THIS to activePlayers who have cards in their hands
-      remainingPlayers = activePlayers;
+      remainingPlayers = remainingPlayersWithCards();
     }
     setSelectedCards([]);
     setActivePlayers(remainingPlayers);
   };
 
   // logic to check if combo is bigger before playing
-  const isSelectedComboBigger = (topCard) => {
+  const isSelectedComboBigger = (selectedCards) => {
+    let topCard = sortCards(selectedCards)[selectedCards.length - 1];
     let cardToBeat = lastPlayedCardsInRound[lastPlayedCardsInRound.length - 1];
     if (topCard.order !== cardToBeat.order) {
       return topCard.order > cardToBeat.order;
@@ -247,12 +271,6 @@ const App = () => {
       return true;
     }
     return false;
-  };
-
-  // logic for checking if player's hand is empty
-  const isPlayerHandEmpty = (player) => {
-    let playerNumber = player;
-    return playersHands[playerNumber].length === 0;
   };
 
   // logic for playing selected cards
@@ -280,10 +298,7 @@ const App = () => {
     }
 
     // check if selected combo is larger than current combo to beat
-    if (
-      !isNewRound() &&
-      !isSelectedComboBigger(selectedCards[selectedCards.length - 1])
-    ) {
+    if (!isNewRound() && !isSelectedComboBigger(selectedCards)) {
       addToGameLog(
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
       );
@@ -324,7 +339,6 @@ const App = () => {
       addToGameLog(`Player ${currentPlayer} has no more cards!`);
     }
     // set the new hands
-    debugger;
     setActivePlayers(Object.keys(currentPlayersHands));
     setPlayersHands(currentPlayersHands);
 
