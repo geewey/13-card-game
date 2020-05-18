@@ -216,11 +216,11 @@ const App = () => {
         `Player ${player} passed. Player ${nextPlayer()} wins this round. New round! Play any combo!`
       );
       console.log(
-        `Player ${player} passed. Player ${nextPlayer()} wins this round. New round! Play any combo!`
+        `Player ${nextPlayer()} wins this round. New round! Play any combo!`
       );
       moveToNextPlayer();
       setNewRound();
-      // NEED TO FIX THIS
+      // NEED TO FIX THIS to activePlayers who have cards in their hands
       remainingPlayers = activePlayers;
     }
     setSelectedCards([]);
@@ -324,6 +324,7 @@ const App = () => {
       addToGameLog(`Player ${currentPlayer} has no more cards!`);
     }
     // set the new hands
+    debugger;
     setActivePlayers(Object.keys(currentPlayersHands));
     setPlayersHands(currentPlayersHands);
 
@@ -337,10 +338,10 @@ const App = () => {
   const displayRules = () => {
     alert("Click cards, then select 'Play selected cards!'");
     alert("Valid card combos include the following:");
-    alert("1. any single, double, triple, quad of same card");
-    alert("2. runs of 3+ consecutive singles (2s not allowed in run)");
-    alert("3. runs of 3+ consecutive doubles (2s not allowed in run)");
-    alert("4. runs of 3+ consecutive triples (2s not allowed in run)");
+    alert("1. any single, double, triple, or quad of the same card.");
+    alert(
+      "2. straights of 3+ consecutive singles, doubles, or triples (2s cannot be included in straights)."
+    );
     alert("See rules at https://www.pagat.com/climbing/thirteen.html");
     addToGameLog(`See rules at https://www.pagat.com/climbing/thirteen.html`);
   };

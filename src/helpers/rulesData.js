@@ -14,7 +14,7 @@ const cardsAreSame = (arr) => {
 
 const noTwosAreSelected = (arr) => {
   if (arr.some((card) => card.order === 13)) {
-    console.log("2s not allowed in run!");
+    console.log("2s not allowed in straight!");
     return false;
   }
   return true;
@@ -58,10 +58,10 @@ const triplesAreConsecutive = (arr) => {
 };
 
 // Valid combos:
-// 1. any single, double, triple, quad of same card
-// 2. runs of 3+ consecutive singles (2s not allowed in run)
-// 3. runs of 3+ consecutive doubles (2s not allowed in run)
-// 4. runs of 3+ consecutive triples (2s not allowed in run)
+// 1. any single, double, triple, quad of the same card
+// 2. straights of 3+ consecutive singles (2s cannot be included in straights)
+// 3. straights of 3+ consecutive doubles (2s cannot be included in straights)
+// 4. straights of 3+ consecutive triples (2s cannot be included in straights)
 const comboIsASingle = (cards) => {
   return cards.length === 1;
 };
@@ -74,14 +74,14 @@ const comboIsATriple = (cards) => {
 const comboIsAQuad = (cards) => {
   return cards.length === 4 && cardsAreSame(cards);
 };
-const comboIsRunOfSingles = (cards) => {
+const comboIsStraightOfSingles = (cards) => {
   return (
     cards.length >= 3 &&
     singlesAreConsecutive(cards) &&
     noTwosAreSelected(cards)
   );
 };
-const comboIsRunOfDoubles = (cards) => {
+const comboIsStraightOfDoubles = (cards) => {
   return (
     cards.length >= 6 &&
     cards.length % 2 === 0 &&
@@ -89,7 +89,7 @@ const comboIsRunOfDoubles = (cards) => {
     noTwosAreSelected(cards)
   );
 };
-const comboIsRunOfTriples = (cards) => {
+const comboIsStraightOfTriples = (cards) => {
   return (
     cards.length >= 9 &&
     cards.length % 3 === 0 &&
@@ -103,9 +103,9 @@ const comboOfSelectedCards = (cards) => {
   if (comboIsADouble(cards)) return "double";
   if (comboIsATriple(cards)) return "triple";
   if (comboIsAQuad(cards)) return "quad";
-  if (comboIsRunOfSingles(cards)) return "single run";
-  if (comboIsRunOfDoubles(cards)) return "double run";
-  if (comboIsRunOfTriples(cards)) return "triple run";
+  if (comboIsStraightOfSingles(cards)) return "single straight";
+  if (comboIsStraightOfDoubles(cards)) return "double straight";
+  if (comboIsStraightOfTriples(cards)) return "triple straight";
   return false;
 };
 
