@@ -1,8 +1,7 @@
 import React from "react";
 
 const HandsContainer = ({
-  // hands,
-  handsValues,
+  playersHandsValues,
   selectedCards,
   isCardSelected,
   handleSelectCard,
@@ -12,15 +11,15 @@ const HandsContainer = ({
 }) => {
   return (
     <div className="hand-container">
-      {handsValues.map((hand, idx) => {
+      {playersHandsValues.map((playerHand, idx) => {
         let playerNumber = (idx + 1).toString();
         return (
           <div
             key={playerNumber}
             className={currentPlayer !== playerNumber ? "hidden" : ""}
           >
-            <h4>{`Player ${playerNumber} Hand`}</h4>
-            {hand.map((card) => {
+            <h2>{`Player ${playerNumber} Hand`}</h2>
+            {playerHand.map((card) => {
               return (
                 <img
                   className={

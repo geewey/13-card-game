@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import HandsContainer from "../containers/HandsContainer";
 import HeaderContainer from "../containers/HeaderContainer";
+import GameLogContainer from "../containers/GameLogContainer";
+import HandsContainer from "../containers/HandsContainer";
 import PlayedCardsContainer from "../containers/PlayedCardsContainer";
 import allCards from "../helpers/cardData";
 import {
@@ -17,7 +18,7 @@ const suitRankMap = {
   hearts: 4,
 };
 
-const playersInitialHands = {
+const initialPlayersHands = {
   "1": [],
   "2": [],
   "3": [],
@@ -27,43 +28,48 @@ const playersInitialHands = {
 let currentPlayers = ["1", "2", "3", "4"];
 
 const App = () => {
-  const [hands, setHands] = useState(playersInitialHands);
+  const [playersHands, setPlayersHands] = useState(initialPlayersHands);
   const [selectedCards, setSelectedCards] = useState([]);
   const [typeOfRound, setTypeOfRound] = useState("");
   const [activePlayers, setActivePlayers] = useState(["1", "2", "3", "4"]);
   const [currentPlayer, setCurrentPlayer] = useState("");
-  // consider refactoring and deleting cardToBeat
-  const [cardToBeat, setCardToBeat] = useState("");
   const [lastPlayedCardsInRound, setLastPlayedCardsInRound] = useState([]);
   const [playedCards, setPlayedCards] = useState([]);
+  const [gameLog, setGameLog] = useState([]);
 
   const setNewRound = () => {
     setTypeOfRound("");
     setLastPlayedCardsInRound([]);
-    setCardToBeat("");
   };
 
-  const handsValues = () => {
-    return Object.values(hands);
+  const playersHandsValues = () => {
+    return Object.values(playersHands);
   };
 
   const veryFirstTurn = () => {
-    return handsValues().flat().length === 52 ? true : false;
+    return playersHandsValues().flat().length === 52 ? true : false;
   };
 
   const allHandsEmpty = () => {
-    return handsValues().flat().length === 0 ? true : false;
+    return playersHandsValues().flat().length === 0 ? true : false;
   };
 
   const isNewRound = () => {
-    return lastPlayedCardsInRound.length === 0 && cardToBeat === "";
+    return lastPlayedCardsInRound.length === 0 ? true : false;
+  };
+
+  const addToGameLog = (message) => {
+    setGameLog([message, ...gameLog]);
   };
 
   // sets combo type
   const playCombo = (type) => {
     setTypeOfRound(type);
+    addToGameLog(
+      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`
+    );
     console.log(
-      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} cards`
+      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`
     );
   };
 
@@ -87,17 +93,17 @@ const App = () => {
   };
 
   // logic for dealing a hand of 13 random cards
-  const dealHand = (allCards) => {
+  const dealNewHands = (allCards) => {
     let availableCards = [...allCards];
-    let newHands = {};
+    let newPlayersHands = {};
     let firstPlayer = "";
 
     for (let i = 1; i <= 4; i++) {
-      let newHand = [];
-      while (newHand.length < 13) {
+      let newPlayerHand = [];
+      while (newPlayerHand.length < 13) {
         let randomCard =
           availableCards[Math.floor(Math.random() * availableCards.length)];
-        newHand.push(randomCard);
+        newPlayerHand.push(randomCard);
 
         if (randomCard["name"] === "3 Spades") {
           markFirstPlayer(i.toString());
@@ -109,12 +115,16 @@ const App = () => {
       }
 
       // sort hand by rank (per rules of 13 card game)
-      let sortedHand = sortCards(newHand);
-      newHands[[i.toString()]] = sortedHand;
+      let sortedHand = sortCards(newPlayerHand);
+      newPlayersHands[[i.toString()]] = sortedHand;
     }
-    setHands(newHands);
-    console.log("New game has started!");
-    console.log(`Player ${firstPlayer} has 3 of Spades and goes first!`);
+    setPlayersHands(newPlayersHands);
+    setGameLog([
+      `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`,
+    ]);
+    console.log(
+      `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`
+    );
   };
 
   const selectedCardsAreValidCombo = () => {
@@ -174,10 +184,14 @@ const App = () => {
   // logic for current player passing their turn
   const handlePass = (player) => {
     if (allHandsEmpty()) {
+      addToGameLog("Please click 'Deal a new hand' to start a game!");
       console.log("Please click 'Deal a new hand' to start a game!");
       alert("Please click 'Deal a new hand' to start a game!");
       return;
     } else if (veryFirstTurn()) {
+      addToGameLog(
+        "The first player cannot pass! Please select and play a combo that includes 3 of spades."
+      );
       console.log(
         "The first player cannot pass! Please select and play a combo that includes 3 of spades."
       );
@@ -187,6 +201,7 @@ const App = () => {
       return;
     }
 
+    addToGameLog(`Player ${player} passed`);
     console.log(`Player ${player} passed`);
 
     let remainingPlayers;
@@ -196,6 +211,7 @@ const App = () => {
       );
       moveToNextPlayer();
     } else {
+      addToGameLog(`Player ${nextPlayer()} wins this round. New round!`);
       console.log(`Player ${nextPlayer()} wins this round. New round!`);
       moveToNextPlayer();
       setNewRound();
@@ -207,6 +223,7 @@ const App = () => {
 
   // logic to check if combo is bigger before playing
   const isSelectedComboBigger = (topCard) => {
+    let cardToBeat = lastPlayedCardsInRound[lastPlayedCardsInRound.length - 1];
     if (topCard.order !== cardToBeat.order) {
       return topCard.order > cardToBeat.order;
     } else {
@@ -229,12 +246,14 @@ const App = () => {
   // logic for playing selected cards
   const handlePlaySelectedCards = () => {
     if (!someCardsAreSelected(selectedCards)) {
+      addToGameLog("No cards are selected. Not a valid play!");
       console.log("No cards are selected. Not a valid play!");
       alert("No cards are selected. Not a valid play!");
       return;
     }
     // check if first hand has 3 of spades!
     if (veryFirstTurn() && !firstPlayerPlays3Spades(selectedCards)) {
+      addToGameLog("First player in game must play a combo with 3 of Spades!");
       console.log("First player in game must play a combo with 3 of Spades!");
       alert("First player in game must play a combo with 3 of Spades!");
       return;
@@ -242,6 +261,7 @@ const App = () => {
 
     // check if selected cards are valid combo to play
     if (!selectedCardsAreValidCombo()) {
+      addToGameLog("Selection is not a valid combo!");
       console.log("Selection is not a valid combo!");
       alert("Selection is not a valid combo!");
       return;
@@ -252,6 +272,9 @@ const App = () => {
       !isNewRound() &&
       !isSelectedComboBigger(selectedCards[selectedCards.length - 1])
     ) {
+      addToGameLog(
+        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
+      );
       console.log(
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
       );
@@ -263,6 +286,7 @@ const App = () => {
 
     // check to check selected combo is same as round type
     if (!isNewRound() && !selectedComboMatchesRoundType()) {
+      addToGameLog("Selected type of combo is not the same as round type!");
       console.log("Selected type of combo is not the same as round type!");
       alert("Selected type of combo is not the same as round type!");
       return;
@@ -273,16 +297,15 @@ const App = () => {
     let allPlayedCards = [sortedSelectedCards, ...playedCards];
     setPlayedCards(allPlayedCards);
     playCombo(comboOfSelectedCards(sortedSelectedCards));
-
-    // sets the history for combo to beat
     setLastPlayedCardsInRound(sortedSelectedCards);
-    setCardToBeat(sortedSelectedCards[sortedSelectedCards.length - 1]);
 
     // iterate and filter selected cards out of hand
-    let currentHands = { ...hands };
-    let currentPlayerUpdatedHand = filterCards(hands[parseInt(currentPlayer)]);
-    currentHands[currentPlayer] = currentPlayerUpdatedHand;
-    setHands(currentHands);
+    let currentPlayersHands = { ...playersHands };
+    let currentPlayerUpdatedHand = filterCards(
+      playersHands[parseInt(currentPlayer)]
+    );
+    currentPlayersHands[currentPlayer] = currentPlayerUpdatedHand;
+    setPlayersHands(currentPlayersHands);
 
     // clear selected cards
     setSelectedCards([]);
@@ -293,6 +316,13 @@ const App = () => {
 
   const displayRules = () => {
     alert("Click cards, then select 'Play selected cards!'");
+    alert("Valid card combos include the following:");
+    alert("1. any single, double, triple, quad of same card");
+    alert("2. runs of 3+ consecutive singles (2s not allowed in run)");
+    alert("3. runs of 3+ consecutive doubles (2s not allowed in run)");
+    alert("4. runs of 3+ consecutive triples (2s not allowed in run)");
+    alert("See rules at https://www.pagat.com/climbing/thirteen.html");
+    addToGameLog(`See rules at https://www.pagat.com/climbing/thirteen.html`);
   };
 
   // HeaderContainer for "Deal button" logic
@@ -300,7 +330,7 @@ const App = () => {
     setPlayedCards([]);
     setSelectedCards([]);
     setNewRound();
-    dealHand(allCards);
+    dealNewHands(allCards);
   };
 
   return (
@@ -309,8 +339,9 @@ const App = () => {
         handleDealCards={handleDealCards}
         displayRules={displayRules}
       />
+      <GameLogContainer gameLog={gameLog} />
       <HandsContainer
-        handsValues={handsValues()}
+        playersHandsValues={playersHandsValues()}
         selectedCards={selectedCards}
         isCardSelected={isCardSelected}
         handleSelectCard={handleSelectCard}

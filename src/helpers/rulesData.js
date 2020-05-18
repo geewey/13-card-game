@@ -109,15 +109,4 @@ const comboOfSelectedCards = (cards) => {
   return false;
 };
 
-export {
-  someCardsAreSelected,
-  firstPlayerPlays3Spades,
-  comboIsASingle,
-  comboIsADouble,
-  comboIsATriple,
-  comboIsAQuad,
-  comboIsRunOfSingles,
-  comboIsRunOfDoubles,
-  comboIsRunOfTriples,
-  comboOfSelectedCards,
-};
+export { someCardsAreSelected, firstPlayerPlays3Spades, comboOfSelectedCards };

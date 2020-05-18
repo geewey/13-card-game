@@ -28,6 +28,7 @@
 }
 
 .header-container,
+.game-log-container,
 .hand-container,
 .played-cards-container {
   border: 1px;
@@ -35,6 +36,14 @@
   border-bottom-style: solid;
   padding: 1vh;
 }
+
+/* CSS INHERITANCE KICKING MY BUTT
+.game-log-container,
+.played-cards-container {
+  max-height: 20%;
+  overflow-y: scroll;
+}
+*/
 
 .selected-card {
   border-radius: 4%;
