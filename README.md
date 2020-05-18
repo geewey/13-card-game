@@ -1,68 +1,27 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Basics of "Thirteen" card game:
 
-## Available Scripts
+- "Thirteen" is a climbing game, where the goal is to be the first player to finish playing all your cards.
+- There are 4 players. The player who goes first is the one dealt the 3 of spades - and must play it in their first combo.
+- The following players must either play a "bigger" combo of same type.
+- If a player is unable or unwilling to play, they can "pass." This means they are out of the current round and cannot play until a new round begins.
+- At the beginning of each new round, the first player to go is whomever won the last round. They can play whatever combo they want.
 
-In the project directory, you can run:
+### What combos can be played:
 
-### `yarn start`
+- There are basically 2 types of combos:
+  (1) single/double/triple/or quad of the same card (ex: 10, 4-4, 7-7-7, Q-Q-Q-Q), or
+  (2) straights of 3+ consecutive singles/doubles/triples (also known as a straight, ex: 3-4-5, 5-6-7-8-9-10, J-J-Q-Q-K-K).
+- A run must be consecutive and cannot contain any 2s.
+- The longest possible run goes from 3 through A.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Card order:
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- By rank: 3s are the smallest, and 2s are the largest. (reminder: 2s cannot be used in runs)
+- By suit, smallest to largest: spade, club, diamond, hearts
+- Thus, 2 of hearts is largest and 3 of spades is smallest
+- The largest card in the combo is what determines what to beat (ex: 4-5-6-7 of clubs can be beaten by 4-5-6-7 of hearts)
+- Thus, the largest possible straight has the Ace of Hearts at the top of the run
 
-### `yarn test`
+### The game rules are here:
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+https://www.pagat.com/climbing/thirteen.html
