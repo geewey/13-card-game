@@ -25,8 +25,6 @@ const initialPlayersHands = {
   "4": [],
 };
 
-let currentPlayers = ["1", "2", "3", "4"];
-
 const App = () => {
   const [playersHands, setPlayersHands] = useState(initialPlayersHands);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -59,7 +57,10 @@ const App = () => {
   };
 
   const addToGameLog = (message) => {
-    setGameLog([message, ...gameLog]);
+    // limiting messages until I figure out CSS...
+    let messages = [...gameLog];
+    if (messages.length > 5) messages.pop();
+    setGameLog([message, ...messages]);
   };
 
   // sets combo type
@@ -87,7 +88,7 @@ const App = () => {
     return sortedCards;
   };
 
-  // set first player
+  // marks player as first to go
   const markFirstPlayer = (playerNumber) => {
     setCurrentPlayer(playerNumber);
   };
@@ -211,11 +212,16 @@ const App = () => {
       );
       moveToNextPlayer();
     } else {
-      addToGameLog(`Player ${nextPlayer()} wins this round. New round!`);
-      console.log(`Player ${nextPlayer()} wins this round. New round!`);
+      addToGameLog(
+        `Player ${player} passed. Player ${nextPlayer()} wins this round. New round! Play any combo!`
+      );
+      console.log(
+        `Player ${player} passed. Player ${nextPlayer()} wins this round. New round! Play any combo!`
+      );
       moveToNextPlayer();
       setNewRound();
-      remainingPlayers = currentPlayers;
+      // NEED TO FIX THIS
+      remainingPlayers = activePlayers;
     }
     setSelectedCards([]);
     setActivePlayers(remainingPlayers);
@@ -243,8 +249,14 @@ const App = () => {
     return false;
   };
 
+  // logic for checking if player's hand is empty
+  const isPlayerHandEmpty = (player) => {
+    let playerNumber = player;
+    return playersHands[playerNumber].length === 0;
+  };
+
   // logic for playing selected cards
-  const handlePlaySelectedCards = () => {
+  const handlePlaySelectedCards = (player) => {
     if (!someCardsAreSelected(selectedCards)) {
       addToGameLog("No cards are selected. Not a valid play!");
       console.log("No cards are selected. Not a valid play!");
@@ -299,12 +311,20 @@ const App = () => {
     playCombo(comboOfSelectedCards(sortedSelectedCards));
     setLastPlayedCardsInRound(sortedSelectedCards);
 
-    // iterate and filter selected cards out of hand
+    // iterate and filter selected cards out of player's hand
     let currentPlayersHands = { ...playersHands };
     let currentPlayerUpdatedHand = filterCards(
       playersHands[parseInt(currentPlayer)]
     );
     currentPlayersHands[currentPlayer] = currentPlayerUpdatedHand;
+
+    // if the player's hand is now empty, delete it
+    if (isPlayerHandEmpty(currentPlayer)) {
+      currentPlayersHands.delete(currentPlayer);
+      addToGameLog(`Player ${currentPlayer} has no more cards!`);
+    }
+    // set the new hands
+    setActivePlayers(Object.keys(currentPlayersHands));
     setPlayersHands(currentPlayersHands);
 
     // clear selected cards
@@ -342,7 +362,6 @@ const App = () => {
       <GameLogContainer gameLog={gameLog} />
       <HandsContainer
         playersHandsValues={playersHandsValues()}
-        selectedCards={selectedCards}
         isCardSelected={isCardSelected}
         handleSelectCard={handleSelectCard}
         handlePlaySelectedCards={handlePlaySelectedCards}

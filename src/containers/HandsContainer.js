@@ -2,7 +2,6 @@ import React from "react";
 
 const HandsContainer = ({
   playersHandsValues,
-  selectedCards,
   isCardSelected,
   handleSelectCard,
   handlePlaySelectedCards,
@@ -37,7 +36,7 @@ const HandsContainer = ({
         );
       })}
       <br></br>
-      <button onClick={() => handlePlaySelectedCards(selectedCards)}>
+      <button onClick={() => handlePlaySelectedCards(currentPlayer)}>
         Play selected cards!
       </button>
       <button onClick={() => handlePass(currentPlayer)}>Pass this round</button>
