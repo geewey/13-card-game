@@ -10,7 +10,7 @@ import {
   comboOfSelectedCards,
 } from "../helpers/rulesData";
 import "./App.css";
-import { testEndGame } from "../helpers/testHands";
+import { testEndGame, testShortEndGame } from "../helpers/testHands";
 
 const suitRankMap = {
   spades: 1,
@@ -134,7 +134,7 @@ const App = () => {
     // test hands here:
     // setPlayersHands(newPlayersHands);
     markFirstPlayer("4");
-    setPlayersHands(testEndGame);
+    setPlayersHands(testShortEndGame);
 
     setGameLog([
       `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`,
@@ -353,6 +353,7 @@ const App = () => {
       delete currentPlayersHands[currentPlayer];
       console.log(`Player ${currentPlayer} has no more cards!`);
       addToGameLog([`Player ${currentPlayer} has no more cards!`]);
+      // create a function here to deal with these cases!!
       currentActivePlayers = activePlayers.filter(
         (activePlayer) => activePlayer !== currentPlayer
       );
