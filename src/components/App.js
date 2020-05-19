@@ -10,6 +10,7 @@ import {
   comboOfSelectedCards,
 } from "../helpers/rulesData";
 import "./App.css";
+import { testEndGame } from "../helpers/testHands";
 
 const suitRankMap = {
   spades: 1,
@@ -53,7 +54,11 @@ const App = () => {
   };
 
   const isPlayerHandEmpty = (player) => {
-    return playersHands[player].length === 0;
+    let currentPlayerHand = playersHands[player];
+    currentPlayerHand = currentPlayerHand.filter(
+      (card) => !selectedCards.includes(card)
+    );
+    return currentPlayerHand.length === 0;
   };
 
   const isNewRound = () => {
@@ -63,8 +68,10 @@ const App = () => {
   const addToGameLog = (messageArray) => {
     // limiting messages until I figure out CSS...
     let messages = [...gameLog];
-    if (messages.length > 5) messages.pop();
     if (messages[0] === messageArray[messageArray.length - 1]) messages.shift();
+    if (messages.length > 5) {
+      while (messages.length + messageArray.length > 5) messages.pop();
+    }
     setGameLog([...messageArray, ...messages]);
   };
 
@@ -124,7 +131,11 @@ const App = () => {
       let sortedHand = sortCards(newPlayerHand);
       newPlayersHands[[i.toString()]] = sortedHand;
     }
-    setPlayersHands(newPlayersHands);
+    // test hands here:
+    // setPlayersHands(newPlayersHands);
+    markFirstPlayer("4");
+    setPlayersHands(testEndGame);
+
     setGameLog([
       `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`,
     ]);
@@ -221,7 +232,7 @@ const App = () => {
       );
       return;
     }
-
+    let nextPlayerToPlay = nextPlayer();
     let remainingPlayers;
     if (activePlayers.length > 2) {
       remainingPlayers = activePlayers.filter(
@@ -232,11 +243,11 @@ const App = () => {
       moveToNextPlayer();
     } else {
       addToGameLog([
+        `Player ${nextPlayerToPlay} wins this round. New round! Play any combo!`,
         `Player ${player} passed`,
-        `Player ${nextPlayer()} wins this round. New round! Play any combo!`,
       ]);
       console.log(
-        `Player ${nextPlayer()} wins this round. New round! Play any combo!`
+        `Player ${nextPlayerToPlay} wins this round. New round! Play any combo!`
       );
       moveToNextPlayer();
       setNewRound();
@@ -272,6 +283,12 @@ const App = () => {
 
   // logic for playing selected cards
   const handlePlaySelectedCards = (player) => {
+    if (allHandsEmpty()) {
+      addToGameLog(["Please click 'Deal a new hand' to start a game!"]);
+      console.log("Please click 'Deal a new hand' to start a game!");
+      return;
+    }
+
     if (!someCardsAreSelected(selectedCards)) {
       addToGameLog(["No cards are selected. Not a valid play!"]);
       console.log("No cards are selected. Not a valid play!");
@@ -329,14 +346,26 @@ const App = () => {
     );
     currentPlayersHands[currentPlayer] = currentPlayerUpdatedHand;
 
+    let currentActivePlayers = activePlayers;
+
     // if the player's hand is now empty, delete it
     if (isPlayerHandEmpty(currentPlayer)) {
-      currentPlayersHands.delete(currentPlayer);
+      delete currentPlayersHands[currentPlayer];
+      console.log(`Player ${currentPlayer} has no more cards!`);
       addToGameLog([`Player ${currentPlayer} has no more cards!`]);
+      currentActivePlayers = activePlayers.filter(
+        (activePlayer) => activePlayer !== currentPlayer
+      );
     }
     // set the new hands
-    setActivePlayers(Object.keys(currentPlayersHands));
     setPlayersHands(currentPlayersHands);
+
+    // doesn't account for players who have passed
+    // setActivePlayers(Object.keys(currentPlayersHands));
+    // let remainingPlayers = activePlayers.filter((activePlayer) =>
+    //   Object.keys(currentPlayersHands)
+    // );
+    setActivePlayers(currentActivePlayers);
 
     // clear selected cards
     setSelectedCards([]);

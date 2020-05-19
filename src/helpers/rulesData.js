@@ -103,9 +103,9 @@ const comboOfSelectedCards = (cards) => {
   if (comboIsADouble(cards)) return "double";
   if (comboIsATriple(cards)) return "triple";
   if (comboIsAQuad(cards)) return "quad";
-  if (comboIsStraightOfSingles(cards)) return "single straight";
-  if (comboIsStraightOfDoubles(cards)) return "double straight";
-  if (comboIsStraightOfTriples(cards)) return "triple straight";
+  if (comboIsStraightOfSingles(cards)) return "straight of singles";
+  if (comboIsStraightOfDoubles(cards)) return "straight of doubles";
+  if (comboIsStraightOfTriples(cards)) return "straight of triples";
   return false;
 };
 
