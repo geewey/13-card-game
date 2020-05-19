@@ -60,19 +60,20 @@ const App = () => {
     return lastPlayedCardsInRound.length === 0 ? true : false;
   };
 
-  const addToGameLog = (message) => {
+  const addToGameLog = (messageArray) => {
     // limiting messages until I figure out CSS...
     let messages = [...gameLog];
     if (messages.length > 5) messages.pop();
-    setGameLog([message, ...messages]);
+    if (messages[0] === messageArray[messageArray.length - 1]) messages.shift();
+    setGameLog([...messageArray, ...messages]);
   };
 
   // sets combo type
   const playCombo = (type) => {
     setTypeOfRound(type);
-    addToGameLog(
-      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`
-    );
+    addToGameLog([
+      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`,
+    ]);
     console.log(
       `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`
     );
@@ -208,36 +209,32 @@ const App = () => {
   // logic for current player passing their turn
   const handlePass = (player) => {
     if (allHandsEmpty()) {
-      addToGameLog("Please click 'Deal a new hand' to start a game!");
+      addToGameLog(["Please click 'Deal a new hand' to start a game!"]);
       console.log("Please click 'Deal a new hand' to start a game!");
-      alert("Please click 'Deal a new hand' to start a game!");
       return;
     } else if (veryFirstTurn()) {
-      addToGameLog(
-        "The first player cannot pass! Please select and play a combo that includes 3 of spades."
-      );
+      addToGameLog([
+        "The first player cannot pass! Please select and play a combo that includes 3 of spades.",
+      ]);
       console.log(
-        "The first player cannot pass! Please select and play a combo that includes 3 of spades."
-      );
-      alert(
         "The first player cannot pass! Please select and play a combo that includes 3 of spades."
       );
       return;
     }
-
-    addToGameLog(`Player ${player} passed`);
-    console.log(`Player ${player} passed`);
 
     let remainingPlayers;
     if (activePlayers.length > 2) {
       remainingPlayers = activePlayers.filter(
         (activePlayer) => activePlayer !== player
       );
+      addToGameLog([`Player ${player} passed`]);
+      console.log(`Player ${player} passed`);
       moveToNextPlayer();
     } else {
-      addToGameLog(
-        `Player ${player} passed. Player ${nextPlayer()} wins this round. New round! Play any combo!`
-      );
+      addToGameLog([
+        `Player ${player} passed`,
+        `Player ${nextPlayer()} wins this round. New round! Play any combo!`,
+      ]);
       console.log(
         `Player ${nextPlayer()} wins this round. New round! Play any combo!`
       );
@@ -276,36 +273,32 @@ const App = () => {
   // logic for playing selected cards
   const handlePlaySelectedCards = (player) => {
     if (!someCardsAreSelected(selectedCards)) {
-      addToGameLog("No cards are selected. Not a valid play!");
+      addToGameLog(["No cards are selected. Not a valid play!"]);
       console.log("No cards are selected. Not a valid play!");
-      alert("No cards are selected. Not a valid play!");
       return;
     }
     // check if first hand has 3 of spades!
     if (veryFirstTurn() && !firstPlayerPlays3Spades(selectedCards)) {
-      addToGameLog("First player in game must play a combo with 3 of Spades!");
+      addToGameLog([
+        "First player in game must play a combo with 3 of Spades!",
+      ]);
       console.log("First player in game must play a combo with 3 of Spades!");
-      alert("First player in game must play a combo with 3 of Spades!");
       return;
     }
 
     // check if selected cards are valid combo to play
     if (!selectedCardsAreValidCombo()) {
-      addToGameLog("Selection is not a valid combo!");
+      addToGameLog(["Selection is not a valid combo!"]);
       console.log("Selection is not a valid combo!");
-      alert("Selection is not a valid combo!");
       return;
     }
 
     // check if selected combo is larger than current combo to beat
     if (!isNewRound() && !isSelectedComboBigger(selectedCards)) {
-      addToGameLog(
-        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
-      );
+      addToGameLog([
+        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round.",
+      ]);
       console.log(
-        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
-      );
-      alert(
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
       );
       return;
@@ -313,9 +306,12 @@ const App = () => {
 
     // check to check selected combo is same as round type
     if (!isNewRound() && !selectedComboMatchesRoundType()) {
-      addToGameLog("Selected type of combo is not the same as round type!");
-      console.log("Selected type of combo is not the same as round type!");
-      alert("Selected type of combo is not the same as round type!");
+      addToGameLog([
+        `Selected type of combo is not the same as round type! Please play a ${typeOfRound} with ${lastPlayedCardsInRound.length} card(s).`,
+      ]);
+      console.log(
+        `Selected type of combo is not the same as round type! Please play a ${typeOfRound} with ${lastPlayedCardsInRound.length} card(s).`
+      );
       return;
     }
 
@@ -336,7 +332,7 @@ const App = () => {
     // if the player's hand is now empty, delete it
     if (isPlayerHandEmpty(currentPlayer)) {
       currentPlayersHands.delete(currentPlayer);
-      addToGameLog(`Player ${currentPlayer} has no more cards!`);
+      addToGameLog([`Player ${currentPlayer} has no more cards!`]);
     }
     // set the new hands
     setActivePlayers(Object.keys(currentPlayersHands));
@@ -357,7 +353,7 @@ const App = () => {
       "2. straights of 3+ consecutive singles, doubles, or triples (2s cannot be included in straights)."
     );
     alert("See rules at https://www.pagat.com/climbing/thirteen.html");
-    addToGameLog(`See rules at https://www.pagat.com/climbing/thirteen.html`);
+    addToGameLog(["See rules at https://www.pagat.com/climbing/thirteen.html"]);
   };
 
   // HeaderContainer for "Deal button" logic
@@ -374,7 +370,6 @@ const App = () => {
         handleDealCards={handleDealCards}
         displayRules={displayRules}
       />
-      <GameLogContainer gameLog={gameLog} />
       <HandsContainer
         playersHandsValues={playersHandsValues()}
         isCardSelected={isCardSelected}
@@ -383,6 +378,7 @@ const App = () => {
         currentPlayer={currentPlayer}
         handlePass={handlePass}
       />
+      <GameLogContainer gameLog={gameLog} />
       <PlayedCardsContainer playedCards={playedCards} />
     </>
   );
