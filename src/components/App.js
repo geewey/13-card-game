@@ -344,7 +344,7 @@ const App = () => {
     let currentPlayerUpdatedHand = filterCards(
       playersHands[parseInt(currentPlayer)]
     );
-    currentPlayersHands[currentPlayer] = currentPlayerUpdatedHand;
+    currentPlayersHands[player] = currentPlayerUpdatedHand;
 
     let currentActivePlayers = activePlayers;
 
@@ -356,15 +356,13 @@ const App = () => {
       currentActivePlayers = activePlayers.filter(
         (activePlayer) => activePlayer !== currentPlayer
       );
+      if (currentActivePlayers.length === 0) {
+        console.log("Game over! Congratulations!");
+        addToGameLog(["Game over! Congratulations!"]);
+      }
     }
     // set the new hands
     setPlayersHands(currentPlayersHands);
-
-    // doesn't account for players who have passed
-    // setActivePlayers(Object.keys(currentPlayersHands));
-    // let remainingPlayers = activePlayers.filter((activePlayer) =>
-    //   Object.keys(currentPlayersHands)
-    // );
     setActivePlayers(currentActivePlayers);
 
     // clear selected cards
@@ -400,7 +398,7 @@ const App = () => {
         displayRules={displayRules}
       />
       <HandsContainer
-        playersHandsValues={playersHandsValues()}
+        playersHands={playersHands}
         isCardSelected={isCardSelected}
         handleSelectCard={handleSelectCard}
         handlePlaySelectedCards={handlePlaySelectedCards}
