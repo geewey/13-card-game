@@ -132,9 +132,9 @@ const App = () => {
       newPlayersHands[[i.toString()]] = sortedHand;
     }
     // test hands here:
-    // setPlayersHands(newPlayersHands);
-    markFirstPlayer("4");
-    setPlayersHands(testShortEndGame);
+    // markFirstPlayer("4");
+    // setPlayersHands(testShortEndGame);
+    setPlayersHands(newPlayersHands);
 
     setGameLog([
       `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`,
