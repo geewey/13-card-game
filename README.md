@@ -1,3 +1,7 @@
+### Want to jump right in?
+- Play the popular Vietnamese card game: https://clever-bhaskara-5ce692.netlify.app/
+- Grab 3 others, open the link on your phone or iPad ^^, and pass-and-play!
+
 ### Basics of "Thirteen" card game:
 
 - "Thirteen" is a climbing game, where the goal is to be the first player to finish playing all your cards.
@@ -22,6 +26,5 @@
 - The largest card in the combo is what determines what to beat (ex: 4-5-6-7 of clubs can be beaten by 4-5-6-7 of hearts)
 - Thus, the largest possible straight has the Ace of Hearts at the top of the straight
 
-### The game rules are here:
-
-https://www.pagat.com/climbing/thirteen.html
+### The full game rules are here:
+- https://www.pagat.com/climbing/thirteen.html
