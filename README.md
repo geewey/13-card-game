@@ -1,5 +1,5 @@
 ### Want to jump right in?
-- Play the popular Vietnamese card game: https://clever-bhaskara-5ce692.netlify.app/
+- Play the popular Vietnamese card game: https://thirteen-card-game.netlify.app/
 - Grab 3 others, open the link on your phone or iPad ^^, and pass-and-play!
 
 ### Basics of "Thirteen" card game:
