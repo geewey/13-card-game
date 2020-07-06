@@ -37,14 +37,6 @@
   padding: 1vh;
 }
 
-/* CSS INHERITANCE KICKING MY BUTT
-.game-log-container,
-.played-cards-container {
-  max-height: 20%;
-  overflow-y: scroll;
-}
-*/
-
 .selected-card {
   border-radius: 4%;
   border: 2px solid red;
