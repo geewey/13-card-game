@@ -403,4 +403,70 @@ const testEndGame = {
   ],
 };
 
-export { testThreeConsecutiveTriples, testAllCards, testEndGame };
+const testShortEndGame = {
+  "1": [
+    { name: "Ace Clubs", rank: 1, order: 12, suit: "clubs", imgName: "1c" },
+    { name: "2 Clubs", rank: 2, order: 13, suit: "clubs", imgName: "2c" },
+    { name: "3 Clubs", rank: 3, order: 1, suit: "clubs", imgName: "3c" },
+    { name: "4 Clubs", rank: 4, order: 2, suit: "clubs", imgName: "4c" },
+    { name: "5 Clubs", rank: 5, order: 3, suit: "clubs", imgName: "5c" },
+  ],
+  "2": [
+    {
+      name: "Ace Diamonds",
+      rank: 1,
+      order: 12,
+      suit: "diamonds",
+      imgName: "1d",
+    },
+    {
+      name: "2 Diamonds",
+      rank: 2,
+      order: 13,
+      suit: "diamonds",
+      imgName: "2d",
+    },
+    {
+      name: "3 Diamonds",
+      rank: 3,
+      order: 1,
+      suit: "diamonds",
+      imgName: "3d",
+    },
+    {
+      name: "4 Diamonds",
+      rank: 4,
+      order: 2,
+      suit: "diamonds",
+      imgName: "4d",
+    },
+    {
+      name: "5 Diamonds",
+      rank: 5,
+      order: 3,
+      suit: "diamonds",
+      imgName: "5d",
+    },
+  ],
+  "3": [
+    { name: "Ace Hearts", rank: 1, order: 12, suit: "hearts", imgName: "1h" },
+    { name: "2 Hearts", rank: 2, order: 13, suit: "hearts", imgName: "2h" },
+    { name: "3 Hearts", rank: 3, order: 1, suit: "hearts", imgName: "3h" },
+    { name: "4 Hearts", rank: 4, order: 2, suit: "hearts", imgName: "4h" },
+    { name: "5 Hearts", rank: 5, order: 3, suit: "hearts", imgName: "5h" },
+  ],
+  "4": [
+    { name: "Ace Spades", rank: 1, order: 12, suit: "spades", imgName: "1s" },
+    { name: "2 Spades", rank: 2, order: 13, suit: "spades", imgName: "2s" },
+    { name: "3 Spades", rank: 3, order: 1, suit: "spades", imgName: "3s" },
+    { name: "4 Spades", rank: 4, order: 2, suit: "spades", imgName: "4s" },
+    { name: "5 Spades", rank: 5, order: 3, suit: "spades", imgName: "5s" },
+  ],
+};
+
+export {
+  testThreeConsecutiveTriples,
+  testAllCards,
+  testEndGame,
+  testShortEndGame,
+};
