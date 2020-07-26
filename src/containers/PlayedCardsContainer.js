@@ -3,7 +3,7 @@ import React from "react";
 const PlayedCardsContainer = ({ playedCards }) => {
   return (
     <div className="played-cards-container">
-      <h2>Played cards</h2>
+      <h2>Played Cards</h2>
       {playedCards.map((cards, idx) => {
         return (
           <div key={idx + 1}>

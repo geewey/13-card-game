@@ -10,7 +10,7 @@ import {
   comboOfSelectedCards,
 } from "../helpers/rulesData";
 import "./App.css";
-import { testEndGame, testShortEndGame } from "../helpers/testHands";
+// import { testEndGame, testShortEndGame } from "../helpers/testHands";
 
 const suitRankMap = {
   spades: 1,

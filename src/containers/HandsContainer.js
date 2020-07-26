@@ -10,13 +10,14 @@ const HandsContainer = ({
 }) => {
   return (
     <div className="hand-container">
+      <h2>Current Active Hand</h2>
       {Object.entries(playersHands).map(([playerNumber, playerHand]) => {
         return (
           <div
             key={playerNumber}
             className={currentPlayer !== playerNumber ? "hidden" : ""}
           >
-            <h2>{`Player ${playerNumber} Hand`}</h2>
+            <h3 className="player-hand-title">{`Player ${playerNumber} Hand`}</h3>
             {playerHand.map((card) => {
               return (
                 <img
@@ -35,10 +36,15 @@ const HandsContainer = ({
         );
       })}
       <br></br>
-      <button onClick={() => handlePlaySelectedCards(currentPlayer)}>
+      <button
+        className="play-button"
+        onClick={() => handlePlaySelectedCards(currentPlayer)}
+      >
         Play selected cards!
       </button>
-      <button onClick={() => handlePass(currentPlayer)}>Pass this round</button>
+      <button className="pass-button" onClick={() => handlePass(currentPlayer)}>
+        Pass this round
+      </button>
     </div>
   );
 };

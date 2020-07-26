@@ -17,10 +17,26 @@
   padding: 0px 20px;
 }
 
-.small-card {
-  width: 5rem;
+.small-card,
+.selected-card {
+  width: 6rem;
   height: auto;
-  margin: 0.4rem;
+  margin: 0.1rem;
+}
+
+.small-card {
+  /* z-index: 2; */
+  /* transition: all ease-in-out 0.1s; */
+  transform: translateZ(0);
+}
+
+.selected-card {
+  border-radius: 4%;
+  border: 2px solid red;
+  position: relative;
+  top: -2rem;
+  /* z-index: 1 ; */
+  transform: translateY(-1rem);
 }
 
 .small-card.hand {
@@ -37,10 +53,28 @@
   padding: 1vh;
 }
 
-.selected-card {
-  border-radius: 4%;
-  border: 2px solid red;
-  width: 5.5rem;
-  height: auto;
-  margin: 0.4rem;
+.header-container {
+  background-color: rgb(35, 35, 35);
+}
+
+.app-title {
+  margin-top: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.deal-button,
+.rules-button,
+.play-button,
+.pass-button {
+  margin-bottom: 0.7rem;
+}
+
+.deal-button,
+.play-button {
+  margin-right: 0.3rem;
+}
+
+.player-hand-title {
+  margin-bottom: 4rem;
+  color: hsl(34, 100%, 60%);
 }
