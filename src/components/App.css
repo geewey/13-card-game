@@ -26,7 +26,6 @@
 .small-card {
   margin: 0.1rem;
   margin-bottom: 1rem;
-  /* z-index: 2; */
   /* transition: all ease-in-out 0.1s; */
   transform: translateZ(0);
 }
@@ -36,8 +35,6 @@
   border: 0.1em solid red;
   border-radius: 4%;
   position: relative;
-  /* top: -2rem; */
-  /* z-index: 1 ; */
   transform: translateY(-2rem);
 }
 
