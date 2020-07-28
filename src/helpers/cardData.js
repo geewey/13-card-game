@@ -1,4 +1,11 @@
-export default [
+const suitRankMap = {
+  spades: 1,
+  clubs: 2,
+  diamonds: 3,
+  hearts: 4,
+};
+
+const allCards = [
   {
     name: "Ace Diamonds",
     rank: 1,
@@ -178,3 +185,5 @@ export default [
     imgName: "13s",
   },
 ];
+
+export { allCards, suitRankMap };

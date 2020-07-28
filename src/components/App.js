@@ -3,7 +3,7 @@ import HeaderContainer from "../containers/HeaderContainer";
 import GameLogContainer from "../containers/GameLogContainer";
 import HandsContainer from "../containers/HandsContainer";
 import PlayedCardsContainer from "../containers/PlayedCardsContainer";
-import allCards from "../helpers/cardData";
+import { allCards, suitRankMap } from "../helpers/cardData";
 import {
   someCardsAreSelected,
   firstPlayerPlays3Spades,
@@ -11,19 +11,18 @@ import {
 } from "../helpers/rulesData";
 import "./App.css";
 // import { testEndGame, testShortEndGame } from "../helpers/testHands";
-
-const suitRankMap = {
-  spades: 1,
-  clubs: 2,
-  diamonds: 3,
-  hearts: 4,
-};
+import { testShortEndGame } from "../helpers/testHands";
 
 const initialPlayersHands = {
   "1": [],
   "2": [],
   "3": [],
   "4": [],
+};
+
+const pickupRoundDefault = {
+  isPickupRound: false,
+  pickupPlayer: "",
 };
 
 const App = () => {
@@ -33,6 +32,7 @@ const App = () => {
   const [activePlayers, setActivePlayers] = useState(["1", "2", "3", "4"]);
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [lastPlayedCardsInRound, setLastPlayedCardsInRound] = useState([]);
+  const [pickupRound, setPickupRound] = useState(pickupRoundDefault);
   const [playedCards, setPlayedCards] = useState([]);
   const [gameLog, setGameLog] = useState([]);
 
@@ -46,7 +46,8 @@ const App = () => {
   };
 
   const veryFirstTurn = () => {
-    return playersHandsValues().flat().length === 52 ? true : false;
+    // return playersHandsValues().flat().length === 52 ? true : false;
+    return playedCards.length === 0 ? true : false;
   };
 
   const allHandsEmpty = () => {
@@ -66,10 +67,10 @@ const App = () => {
   };
 
   const addToGameLog = (messageArray) => {
-    // limiting messages until I figure out CSS...
+    // limits messages to 5 displayed
     let messages = [...gameLog];
     if (messages[0] === messageArray[messageArray.length - 1]) messages.shift();
-    if (messages.length > 5) {
+    if (messages.length + messageArray.length > 5) {
       while (messages.length + messageArray.length > 5) messages.pop();
     }
     setGameLog([...messageArray, ...messages]);
@@ -81,9 +82,6 @@ const App = () => {
     addToGameLog([
       `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`,
     ]);
-    console.log(
-      `Player ${currentPlayer} played a ${type}, ${selectedCards.length} card(s)`
-    );
   };
 
   // sort cards by rank (per rules of 13 card game)
@@ -100,12 +98,12 @@ const App = () => {
     return sortedCards;
   };
 
-  // marks player as first to go
+  // marks player as first to go for the game
   const markFirstPlayer = (playerNumber) => {
     setCurrentPlayer(playerNumber);
   };
 
-  // logic for dealing a hand of 13 random cards
+  // logic for dealing a hand of 13 random cards to 4 players
   const dealNewHands = (allCards) => {
     let availableCards = [...allCards];
     let newPlayersHands = {};
@@ -119,8 +117,8 @@ const App = () => {
         newPlayerHand.push(randomCard);
 
         if (randomCard["name"] === "3 Spades") {
-          markFirstPlayer(i.toString());
           firstPlayer = i.toString();
+          markFirstPlayer(firstPlayer);
         }
         availableCards = availableCards.filter(
           (availableCard) => randomCard !== availableCard
@@ -131,17 +129,14 @@ const App = () => {
       let sortedHand = sortCards(newPlayerHand);
       newPlayersHands[[i.toString()]] = sortedHand;
     }
-    // test hands here:
-    // markFirstPlayer("4");
-    // setPlayersHands(testShortEndGame);
     setPlayersHands(newPlayersHands);
+    // test game logic, scenarios, & hands here by enabling next 2 lines:
+    markFirstPlayer("4");
+    setPlayersHands(testShortEndGame);
 
     setGameLog([
       `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`,
     ]);
-    console.log(
-      `New game has started! Player ${firstPlayer} has the 3 of Spades, so they go first!`
-    );
   };
 
   const selectedCardsAreValidCombo = () => {
@@ -183,10 +178,13 @@ const App = () => {
   };
 
   // logic for returning the next active player
-  // (assuming more than 1 active player)
+  // (helper function used when there are >1 active players)
   const nextPlayer = () => {
+    // note: player numbers are stores as strings in an array
     let currentPlayerNumber = parseInt(currentPlayer);
     let activePlayersNumbers = activePlayers.map((num) => parseInt(num));
+    // if the player number is the "highest", then cycle to "lowest" player number
+    // else, just move the player forward by one
     let nextPlayer =
       currentPlayerNumber === Math.max(...activePlayersNumbers)
         ? Math.min(...activePlayersNumbers)
@@ -217,38 +215,79 @@ const App = () => {
     return remainingPlayersArray;
   };
 
+  // logic to handle when a player finishes hand
+  const handlePlayerFinishedHand = (player) => {
+    console.log(
+      `Player ${player} is out! If nobody beats their last play, Player ${nextPlayer()} can start a new round.`
+    );
+    addToGameLog([
+      `Player ${player} is out! If nobody beats their last play, Player ${nextPlayer()} can start a new round.`,
+    ]);
+    setPickupRound({ isPickupRound: true, pickupPlayer: nextPlayer() });
+  };
+
   // logic for current player passing their turn
+  // break it up - doing too many things:
+  // (1) checks if all hands are empty -or- if it's the very first turn
+  // (2) assigns the next player based on number of active players
+  // (3) checks if a player just got out, or not
   const handlePass = (player) => {
-    if (allHandsEmpty()) {
+    if (allHandsEmpty() || activePlayers.length === 1) {
       addToGameLog(["Please click 'Deal a new hand' to start a game!"]);
-      console.log("Please click 'Deal a new hand' to start a game!");
       return;
     } else if (veryFirstTurn()) {
       addToGameLog([
         "The first player cannot pass! Please select and play a combo that includes 3 of spades.",
       ]);
-      console.log(
-        "The first player cannot pass! Please select and play a combo that includes 3 of spades."
-      );
+      return;
+    } else if (lastPlayedCardsInRound.length === 0) {
+      addToGameLog([
+        `Player ${currentPlayer}, please lead off the round by selecting and playing any combo!`,
+      ]);
       return;
     }
     let nextPlayerToPlay = nextPlayer();
     let remainingPlayers;
-    if (activePlayers.length > 2) {
+
+    // check if a player just finished their hand
+    if (pickupRound.isPickupRound === true && activePlayers.length > 2) {
+      remainingPlayers = activePlayers.filter(
+        (activePlayer) => activePlayer !== player
+      );
+      console.log(
+        `This player will continue if nobody picks up: Player ${pickupRound.pickupPlayer}`
+      );
+      addToGameLog([`Player ${player} passed in the pickup round.`]);
+      moveToNextPlayer();
+    } else if (
+      // if a player finished, and there are not more than 2 active players
+      pickupRound.isPickupRound === true
+    ) {
+      addToGameLog([
+        `Player ${pickupRound.pickupPlayer} wins the pickup round. New round! Play any combo!`,
+        "......",
+        `Player ${player} passed in the pickup round.`,
+      ]);
+      setCurrentPlayer(pickupRound.pickupPlayer);
+      setPickupRound(pickupRoundDefault);
+      remainingPlayers = remainingPlayersWithCards();
+      setNewRound();
+    } else if (activePlayers.length > 2) {
+      // normal round, there are more than 2 players left
+      setPickupRound(pickupRoundDefault);
       remainingPlayers = activePlayers.filter(
         (activePlayer) => activePlayer !== player
       );
       addToGameLog([`Player ${player} passed`]);
-      console.log(`Player ${player} passed`);
       moveToNextPlayer();
     } else {
+      // normal round, there is only 1 player left
+      setPickupRound(pickupRoundDefault);
       addToGameLog([
         `Player ${nextPlayerToPlay} wins this round. New round! Play any combo!`,
+        "......",
         `Player ${player} passed`,
       ]);
-      console.log(
-        `Player ${nextPlayerToPlay} wins this round. New round! Play any combo!`
-      );
       moveToNextPlayer();
       setNewRound();
       // NEED TO FIX THIS to activePlayers who have cards in their hands
@@ -269,7 +308,7 @@ const App = () => {
     }
   };
 
-  // logic to check combo matches round type
+  // logic to check combo matches round type && combo length
   const selectedComboMatchesRoundType = () => {
     let currentCombo = comboOfSelectedCards(selectedCards);
     if (
@@ -285,28 +324,24 @@ const App = () => {
   const handlePlaySelectedCards = (player) => {
     if (allHandsEmpty()) {
       addToGameLog(["Please click 'Deal a new hand' to start a game!"]);
-      console.log("Please click 'Deal a new hand' to start a game!");
       return;
     }
 
     if (!someCardsAreSelected(selectedCards)) {
       addToGameLog(["No cards are selected. Not a valid play!"]);
-      console.log("No cards are selected. Not a valid play!");
       return;
     }
     // check if first hand has 3 of spades!
     if (veryFirstTurn() && !firstPlayerPlays3Spades(selectedCards)) {
       addToGameLog([
-        "First player in game must play a combo with 3 of Spades!",
+        "First player must start the game by playing a combo with 3 of Spades!",
       ]);
-      console.log("First player in game must play a combo with 3 of Spades!");
       return;
     }
 
     // check if selected cards are valid combo to play
     if (!selectedCardsAreValidCombo()) {
       addToGameLog(["Selection is not a valid combo!"]);
-      console.log("Selection is not a valid combo!");
       return;
     }
 
@@ -315,9 +350,6 @@ const App = () => {
       addToGameLog([
         "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round.",
       ]);
-      console.log(
-        "Selection must be a combo that beats the last combo played! If you cannot or do not wish to play, please press 'Pass this round' to skip this round."
-      );
       return;
     }
 
@@ -326,9 +358,6 @@ const App = () => {
       addToGameLog([
         `Selected type of combo is not the same as round type! Please play a ${typeOfRound} with ${lastPlayedCardsInRound.length} card(s).`,
       ]);
-      console.log(
-        `Selected type of combo is not the same as round type! Please play a ${typeOfRound} with ${lastPlayedCardsInRound.length} card(s).`
-      );
       return;
     }
 
@@ -350,18 +379,28 @@ const App = () => {
 
     // if the player's hand is now empty, delete it
     if (isPlayerHandEmpty(currentPlayer)) {
+      handlePlayerFinishedHand(currentPlayer);
       delete currentPlayersHands[currentPlayer];
-      console.log(`Player ${currentPlayer} has no more cards!`);
-      addToGameLog([`Player ${currentPlayer} has no more cards!`]);
       // create a function here to deal with these cases!!
       currentActivePlayers = activePlayers.filter(
         (activePlayer) => activePlayer !== currentPlayer
       );
-      if (currentActivePlayers.length === 0) {
-        console.log("Game over! Congratulations!");
-        addToGameLog(["Game over! Congratulations!"]);
+      if (currentActivePlayers.length === 1) {
+        addToGameLog([
+          'Game over! Congratulations for a great game! Hit "Deal a new hand!" to start a new game!',
+        ]);
       }
     }
+
+    // check if this is in the midst of a pickup round
+    if (pickupRound.isPickupRound === true && activePlayers.length > 1) {
+      setPickupRound({ ...pickupRound, pickupPlayer: currentPlayer });
+    }
+    if (pickupRound.isPickupRound === true && activePlayers.length === 1) {
+      setPickupRound(pickupRoundDefault);
+      currentActivePlayers = remainingPlayersWithCards();
+    }
+
     // set the new hands
     setPlayersHands(currentPlayersHands);
     setActivePlayers(currentActivePlayers);
@@ -390,6 +429,7 @@ const App = () => {
     setSelectedCards([]);
     setNewRound();
     dealNewHands(allCards);
+    setActivePlayers(["1", "2", "3", "4"]);
   };
 
   return (
