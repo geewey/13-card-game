@@ -109,7 +109,7 @@ const App = () => {
     let newPlayersHands = {};
     let firstPlayer = "";
 
-    for (let i = 1; i <= 4; i++) {
+    for (let playerNumber = 1; playerNumber <= 4; playerNumber++) {
       let newPlayerHand = [];
       while (newPlayerHand.length < 13) {
         let randomCard =
@@ -117,7 +117,7 @@ const App = () => {
         newPlayerHand.push(randomCard);
 
         if (randomCard["name"] === "3 Spades") {
-          firstPlayer = i.toString();
+          firstPlayer = playerNumber.toString();
           markFirstPlayer(firstPlayer);
         }
         availableCards = availableCards.filter(
@@ -127,7 +127,7 @@ const App = () => {
 
       // sort hand by rank (per rules of 13 card game)
       let sortedHand = sortCards(newPlayerHand);
-      newPlayersHands[[i.toString()]] = sortedHand;
+      newPlayersHands[[playerNumber.toString()]] = sortedHand;
     }
     setPlayersHands(newPlayersHands);
     // test game logic, scenarios, & hands here by enabling next 2 lines:
