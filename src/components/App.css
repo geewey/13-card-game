@@ -77,3 +77,7 @@
   margin-bottom: 2rem;
   color: hsl(34, 100%, 60%);
 }
+
+.url {
+  color: lightyellow;
+}
